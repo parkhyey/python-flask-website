@@ -1,0 +1,160 @@
+/* Import Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Merienda&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
+
+body {
+    font-family: 'Montserrat', sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
+#header {
+    text-align: center;
+    font-size: 65px;
+    padding-top: 20px;
+    font-family: 'Merienda';
+    font-weight: 700;
+}
+
+#header a {
+    color: rgb(72, 183, 228);
+}
+
+.nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    text-align: right;
+}
+
+.navbutton {
+    background-color: rgb(40, 65, 133);
+    color: white;
+    padding: 16px 30px;
+    font-size: 16px;
+    margin: 20px;
+    border: none;
+    border-radius: 10px;
+}
+
+.navbutton a {
+    color: white;
+}
+
+.navbutton:hover {
+    background-color: rgb(87, 111, 177);
+    color: white;
+}
+
+* {
+    box-sizing: border-box;
+    text-align: center;
+}
+
+/* Create two equal columns that floats next to each other */
+#column {
+    float: left;
+    width: 33%;
+    padding: 10px;
+    height: 300px; /* Should be removed. Only for demonstration */
+}
+
+#column-user {
+    float: left;
+    width: 50%;
+    padding: 10px;
+    height: 300px; /* Should be removed. Only for demonstration */
+}
+
+img {
+    border-radius: 50%;
+}
+
+#main-row {
+    padding-top: 80px;
+}
+
+.footer {
+    position: fixed;
+    text-align: center;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    z-index: 1;
+}
+
+.switch {
+    padding: 0.3rem;
+}
+
+.switch a {
+    padding: 0.5rem;
+}
+
+.switch-button {
+    padding: 0.5rem;
+}
+
+.switch-button-current {
+    background-color: #ccc;
+    font-weight: bold;
+    padding: 0.5rem;
+}
+
+#temp-span {
+    color: #555;
+    font-style: italic;
+    font-size: 1rem;
+}
+
+h2 {
+    font-size: 1.8rem;
+    color: rgb(40, 65, 133);
+}
+
+.card {
+    border: 0.40em solid #f8f9fa;
+    padding: 1rem;
+    margin: 3% 30% 0% 30%;
+    width: 40%;
+    min-width: 25rem;
+}
+
+.form-control {
+    background-color: #eee;
+    border: 1.5px solid #333;
+    padding: 15px 15px;
+    margin-bottom: 1.3rem;
+    text-align: left;
+    width: 20rem;
+}
+
+.form-control:focus {
+    color: #000;
+    background-color: #fff;
+    border: 3px solid #333;
+    outline: 0;
+    box-shadow: none;
+}
+
+.btn {
+    padding: 0.6rem 1.2rem;
+    margin: 0.3rem;
+    background: rgb(72, 183, 228);
+    border: 0px;
+    font-size: 1rem;
+}
+
+.btn-primary:hover {
+    background-color: rgb(41, 164, 212);
+    border: 0px;
+    transition: 0.3s;
+}
+
+.login {
+    padding: 0.6rem 0 1rem 0;
+}
