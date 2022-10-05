@@ -145,16 +145,34 @@ h2 {
     padding: 0.6rem 1.2rem;
     margin: 0.3rem;
     background: rgb(72, 183, 228);
-    border: 0px;
-    font-size: 1rem;
+    border: 1px solid rgb(72, 183, 228);
+    border-radius: 10px;
+    font-size: 0.9rem;
 }
 
 .btn-primary:hover {
-    background-color: rgb(41, 164, 212);
-    border: 0px;
+    background-color: rgb(148, 215, 241);
+    border: 1px solid rgb(72, 183, 228);
     transition: 0.3s;
 }
 
+.btn-login {
+    padding: 0.6rem 1.2rem;
+    margin: 0.3rem;
+    background: white;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
+}
+
+.btn-login:hover {
+    background-color: #aaa;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
 .login {
     padding: 0.6rem 0 1rem 0;
+}
+
+.login a {
+    color: black;
 }
