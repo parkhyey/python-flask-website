@@ -1,5 +1,5 @@
 # Dependencies
-from flask import Flask, render_template, json, url_for, request, session, redirect, flash
+from flask import Flask, render_template
 import os
 import datetime
 
