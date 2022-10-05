@@ -27,6 +27,10 @@ def index_user():
 def signup():
     return render_template("signup.html")
 
+@app.route("/login.html")
+def login():
+    return render_template("login.html")
+
 # Listener
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 7676))
