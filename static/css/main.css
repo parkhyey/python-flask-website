@@ -22,6 +22,12 @@ a {
     color: rgb(72, 183, 228);
 }
 
+.icon {
+    width: 3rem;
+    opacity: 0.35;
+    padding-right: 0.3rem;
+}
+
 .nav {
     list-style-type: none;
     margin: 0;
