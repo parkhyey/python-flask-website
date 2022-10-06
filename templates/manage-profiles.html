@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Dating App for Animal Adoption</title>
+    <link rel="stylesheet" href="../static/css/main.css" />
+  </head>
+  <body>
+    <!-- navbar placeholder-->
+    <div id="navbar"></div>
+
+    <!-- page header placeholder-->
+    <div id="header"></div>
+
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-md-5">
+          <div class="card-profiles">
+            <h3 class="card-title text-center">MANAGE PROFILES</h3>
+            <div class="card-body py-md-4">
+              <!-- testing -->
+              <!-- Table -->
+              <div id="container">
+                <table class="tables" id="profile-table">
+                  <thead>
+                    <tr>
+                      <th>Profile ID</th>
+                      <th>Name</th>
+                      <th>Type</th>
+                      <th>Breed</th>
+                      <th>Disposition</th>
+                      <th>Availability</th>
+                      <th>Description</th>
+                      <th></th>
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for item in items %}
+                    <tr>
+                      <td>{{ item['profile_id'] }}</td>
+                      <td>{{ item['profile_name'] }}</td>
+                      <td>{{ item['profile_type'] }}</td>
+                      <td>{{ item['profile_breed'] }}</td>
+                      <td>{{ item['profile_disposition'] }}</td>
+                      <td>{{ item['profile_availability'] }}</td>
+                      <td>{{ item['profile_description'] }}</td>
+                      <td><button class="btn-profiles"><a href="#">EDIT</a></button></td>
+                      <td><button class="btn-profiles"><a href="#">DELETE</a></button></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- javascript -->
+    <script src="../static/nav.js"></script>
+    <script src="../static/header.js"></script>
+  </body>
+  
+</html>
