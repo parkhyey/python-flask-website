@@ -1,5 +1,5 @@
 /* Import Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Merienda&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Merienda &display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
 body {
@@ -125,7 +125,7 @@ h2 {
 .card {
     border: 0.40em solid #f8f9fa;
     padding: 1rem;
-    margin: 3% 30% 0% 30%;
+    margin: 3% 30% 0;
     width: 40%;
     min-width: 25rem;
 }
@@ -133,7 +133,7 @@ h2 {
 .form-control {
     background-color: #eee;
     border: 1.5px solid #333;
-    padding: 15px 15px;
+    padding: 15px;
     margin-bottom: 1.3rem;
     text-align: left;
     width: 20rem;
@@ -175,10 +175,45 @@ h2 {
     border: 1px solid #ccc;
     transition: 0.3s;
 }
+
 .login {
-    padding: 0.6rem 0 1rem 0;
+    padding: 0.6rem 0 1rem;
 }
 
 .login a {
     color: black;
+}
+
+.container {
+    /* height: 50vh; */
+    /*text-align: center;*/
+    margin: auto;
+}
+
+.tables {
+    text-align: center;
+}
+
+table,
+th,
+td {
+    border: 1px solid;
+    border-collapse: collapse;
+    padding: 0.8rem;
+}
+
+table {
+    width: 100%;
+}
+
+.card-profiles {
+    border: 0.40em solid #f8f9fa;
+    padding: 1rem 2rem 2rem 2rem;
+    margin-top: 3%;
+    width: 100%;
+    min-width: 25rem;
+}
+
+.btn-profiles {
+    padding: 0.5rem;
 }
