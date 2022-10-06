@@ -1,6 +1,7 @@
 # Dependencies
 from flask import Flask, render_template
 import os
+import database.db_connector as db
 import datetime
 
 # Configuration
@@ -14,24 +15,43 @@ def root():
     """Render index.html as home page"""
     return render_template("index.html")
 
-@app.route("/index.html")
+@app.route("/index")
 def index():
     """Render index.html as home page"""
     return render_template("index.html")
 
-@app.route("/index-user.html")
+@app.route("/index-user")
 def index_user():
     return render_template("index-user.html")
 
-@app.route("/signup.html")
+@app.route("/signup")
 def signup():
     return render_template("signup.html")
 
-@app.route("/login.html")
+@app.route("/login")
 def login():
     return render_template("login.html")
 
+@app.route("/search-profiles")
+def search():
+    return render_template("search-profiles.html")
+
+@app.route("/create-profiles")
+def create():
+    return render_template("create-profiles.html")
+
+@app.route("/manage-profiles", methods=["GET", "POST"])
+def manage():
+    db_connection = db.connect_to_database()
+    # select all records from Instructors table joined with Campuses
+    profiles_query = "SELECT * FROM Profiles;"
+    profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_query)
+    profiles_results = profiles_cursor.fetchall()
+
+    db_connection.close()    
+    return render_template("manage-profiles.html", items=profiles_results)
+
 # Listener
 if __name__ == "__main__":
-    port = int(os.environ.get('PORT', 7676))
+    port = int(os.environ.get('PORT', 3306))
     app.run(port=port, debug=True) # Use 'python app.py' or 'flask run' to run in terminal
