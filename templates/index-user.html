@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Dating App for Animal Adoption</title>
-    <link rel="stylesheet" href="../static/css/main.css" />
-  </head>
-  <body>
-    <!-- navbar placeholder-->
-    <div id="navbar">
-    </div>
+    {% extends 'base.html' %}
 
-    <!-- page header placeholder-->
-    <div id="header">
-    </div>
-
+    {% block main %}
     <div id="main">
     <!-- main options -->
       <div id="main-row">
@@ -29,19 +17,13 @@
       </div>
     </div>
 
-    <!-- page footer placeholder-->
+        <!-- page footer placeholder-->
     <div class="footer">
       <!-- switch between admin and user (temporary)-->
       <div class="switch">
-        <button class="switch-button"><a href="/index">Admin View</a></button>
-        <button class="switch-button-current"><a href="/index-user">User View</a></button>
+        <button class="switch-button-current"><a href="/index">Admin View</a></button>
+        <button class="switch-button"><a href="/index-user">User View</a></button>
       </div>
       <span id="temp-span">(These are temp buttons)</span>
-      </div>
-
-    <!-- javascript -->
-    <script src="../static/nav.js"></script>
-    <script src="../static/header.js"></script>
-  </body>
-
-</html>
+    </div>
+    {%  endblock %}

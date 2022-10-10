@@ -1,18 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Dating App for Animal Adoption</title>
-    <link rel="stylesheet" href="../static/css/main.css" />
-  </head>
-  <body>
-    <!-- navbar placeholder-->
-    <div id="navbar">
-    </div>
+    {% extends 'base.html' %}
 
-    <!-- page header placeholder-->
-    <div id="header">
-    </div>
-
+    {% block main %}
     <!-- account signup -->
     <div class="container">
       <div class="row justify-content-center">
@@ -68,10 +56,4 @@
         </div>
       </div>
     </div>
-
-    <!-- javascript -->
-    <script src="../static/nav.js"></script>
-    <script src="../static/header.js"></script>
-
-  </body>
-</html>
+    {%  endblock %}
