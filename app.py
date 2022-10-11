@@ -36,6 +36,14 @@ def login():
 def search():
     return render_template("search-profiles.html")
 
+@app.route("/browse-profiles")
+def browse():
+    return render_template("browse-profiles.html")
+
+@app.route("/daily-news")
+def news():
+    return render_template("daily-news.html")
+
 @app.route("/create-profiles")
 def create():
     return render_template("create-profiles.html")
