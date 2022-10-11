@@ -2,218 +2,289 @@
 @import url('https://fonts.googleapis.com/css2?family=Merienda&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Montserrat&display=swap');
 
+:root {
+  --body-color: #f9f9f9;
+  --text-color: #636363;
+  --text-color-dark: #242738;
+  --white-color: #ffffff;
+}
+
 body {
-    font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: 17px;
+  color: var(--text-color);
+  background-color: var(--body-color)
 }
 
-a {
-    text-decoration: none;
+p {
+  color: var(--text-color);
+  font-size: 15px
 }
 
-#header {
-    text-align: center;
-    font-size: 65px;
-    padding-top: 20px;
-    font-family: 'Merienda';
-    font-weight: 700;
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--text-color-dark);
+  font-weight: 700;
+  line-height: 1.2
 }
 
-#header a {
-    color: rgb(72, 183, 228);
+h1,
+.h1 {
+  font-size: 45px
 }
 
-.icon {
-    width: 3rem;
-    opacity: 0.35;
-    padding-right: 0.3rem;
+h2,
+.h2 {
+  font-size: 32px
 }
 
-.nav {
-    list-style-type: none;
-    margin: 0;
-    padding: 0;
-    background-color: #fff;
-    text-align: right;
+h3,
+.h3 {
+  font-size: 26px
 }
 
-.navbutton {
-    background-color: rgb(40, 65, 133);
-    color: white;
-    padding: 16px 30px;
-    font-size: 16px;
-    margin: 20px;
-    border: none;
-    border-radius: 10px;
+h4,
+.h4 {
+  font-size: 20px
 }
 
-.navbutton a {
-    color: white;
+h5,
+.h5 {
+  font-size: 18px
 }
 
-.navbutton:hover {
-    background-color: rgb(87, 111, 177);
-    color: white;
-}
-
-* {
-    box-sizing: border-box;
-    text-align: center;
-}
-
-/* Create two equal columns that floats next to each other */
-#column {
-    float: left;
-    width: 33%;
-    padding: 10px;
-    height: 300px; /* Should be removed. Only for demonstration */
-}
-
-#column-user {
-    float: left;
-    width: 50%;
-    padding: 10px;
-    height: 300px; /* Should be removed. Only for demonstration */
+h6,
+.h6 {
+  font-size: 14px
 }
 
 img {
-    border-radius: 50%;
+  vertical-align: middle;
+  border: 0
 }
 
-#main-row {
-    padding-top: 80px;
+a,
+a:hover,
+a:focus {
+  text-decoration: none;
+}
+
+.section {
+  padding-top: 60px;
+  padding-bottom: 30px
+}
+
+.admin-section {
+  text-align: center;
+}
+
+.section-title {
+  margin-bottom: 40px
+}
+
+.grid-box .image {
+  position: relative;
+  overflow: hidden;
+}
+
+.grid-box .image img {
+  position: relative;
+  width: 100%;
+  display: block;
+  transition: all 0.3s;
+}
+
+.grid-box:hover .image img {
+  opacity: 0.7;
+}
+
+.grid-box .image h3 {
+  color: #000;
+}
+
+.inner-textbox-content {
+  position: absolute;
+  bottom: 38px;
+  padding: 20px;
+  background-color:rgba(255, 255, 255, 0.8);
+  width: 90%;
+  text-align: center;
+  margin: 0 auto;
+  left: 0px;
+  right: 0px;
+}
+
+.grid-content {
+  background-color:rgba(255, 255, 255, 0.5)
+}
+
+.btn-admin {
+  border: 1px dotted rgb(40, 65, 133);
+  padding: 1rem 4rem;
+  margin: 0 2rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  border-radius: 0;
+  transition: .2s ease
+}
+
+.btn-admin a {
+  color: black;
+}
+
+.btn-admin:hover {
+  background-color: #CCC;
+  border: 1px solid #ccc;
+  transition: 0.2s;
+}
+
+/* previous css --- start*/
+#header {
+  text-align: center;
+  font-size: 65px;
+  padding-top: 10px;
+  font-family: 'Merienda';
+  font-weight: 700;
+}
+
+#header a {
+  color: rgb(72, 183, 228);
+}
+
+.icon {
+  width: 3rem;
+  opacity: 0.35;
+  padding-right: 0.3rem;
+}
+
+.nav {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  text-align: right;
+}
+
+.navbutton {
+  background-color: rgb(40, 65, 133);
+  color: white;
+  padding: 16px 30px;
+  font-size: 16px;
+  margin: 20px;
+  border: none;
+  border-radius: 10px;
+}
+
+.navbutton a {
+  color: white;
+}
+
+.navbutton:hover {
+  background-color: rgb(87, 111, 177);
+  color: white;
 }
 
 .footer {
-    position: fixed;
-    text-align: center;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    padding: 10px;
-    z-index: 1;
-}
-
-.switch {
-    padding: 0.3rem;
-}
-
-.switch a {
-    padding: 0.5rem;
-}
-
-.switch-button {
-    padding: 0.5rem;
-}
-
-.switch-button-current {
-    background-color: #ccc;
-    font-weight: bold;
-    padding: 0.5rem;
-}
-
-#temp-span {
-    color: #555;
-    font-style: italic;
-    font-size: 1rem;
-}
-
-h2 {
-    font-size: 1.8rem;
-    color: rgb(40, 65, 133);
+  position: fixed;
+  text-align: center;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  padding: 10px;
+  z-index: 1;
 }
 
 .card {
-    border: 0.40em solid #f8f9fa;
-    padding: 1rem;
-    margin: 3% 30% 0;
-    width: 40%;
-    min-width: 25rem;
+  border: 0.40em solid #f8f9fa;
+  padding: 1rem;
+  margin: 3% 30% 0;
+  width: 40%;
+  min-width: 25rem;
 }
 
 .form-control {
-    background-color: #eee;
-    border: 1.5px solid #333;
-    padding: 15px;
-    margin-bottom: 1.3rem;
-    text-align: left;
-    width: 20rem;
+  background-color: #eee;
+  border: 1.5px solid #333;
+  padding: 15px;
+  margin-bottom: 1.3rem;
+  text-align: left;
+  width: 20rem;
 }
 
 .form-control:focus {
-    color: #000;
-    background-color: #fff;
-    border: 3px solid #333;
-    outline: 0;
-    box-shadow: none;
+  color: #000;
+  background-color: #fff;
+  border: 3px solid #333;
+  outline: 0;
+  box-shadow: none;
 }
 
-.btn {
-    padding: 0.6rem 1.2rem;
-    margin: 0.3rem;
-    background: rgb(72, 183, 228);
-    border: 1px solid rgb(72, 183, 228);
-    border-radius: 10px;
-    font-size: 0.9rem;
+.btn-primary {
+  padding: 0.6rem 1.2rem;
+  margin: 0.3rem;
+  background: rgb(72, 183, 228);
+  border: 1px solid rgb(72, 183, 228);
+  font-size: 0.9rem;
 }
 
 .btn-primary:hover {
-    background-color: rgb(148, 215, 241);
-    border: 1px solid rgb(72, 183, 228);
-    transition: 0.3s;
+  background-color: rgb(148, 215, 241);
+  border: 1px solid rgb(72, 183, 228);
+  transition: 0.3s;
 }
 
 .btn-login {
-    padding: 0.6rem 1.2rem;
-    margin: 0.3rem;
-    background: white;
-    border: 1px solid #ccc;
-    font-size: 0.9rem;
+  padding: 0.6rem 1.2rem;
+  margin: 0.3rem;
+  background: white;
+  border: 1px solid #ccc;
+  font-size: 0.9rem;
 }
 
 .btn-login:hover {
-    background-color: #aaa;
-    border: 1px solid #ccc;
-    transition: 0.3s;
+  background-color: #aaa;
+  border: 1px solid #ccc;
+  transition: 0.3s;
 }
 
 .login {
-    padding: 0.6rem 0 1rem;
+  padding: 0.6rem 0 1rem;
 }
 
 .login a {
-    color: black;
-}
-
-.container {
-    /* height: 50vh; */
-    /*text-align: center;*/
-    margin: auto;
+  color: black;
 }
 
 .tables {
-    text-align: center;
+  text-align: center;
 }
 
 table,
 th,
 td {
-    border: 1px solid;
-    border-collapse: collapse;
-    padding: 0.8rem;
+  border: 1px solid;
+  border-collapse: collapse;
+  padding: 0.8rem;
 }
 
 table {
-    width: 100%;
+  width: 100%;
 }
 
 .card-profiles {
-    border: 0.40em solid #f8f9fa;
-    padding: 1rem 2rem 2rem 2rem;
-    margin-top: 3%;
-    width: 100%;
-    min-width: 25rem;
+  border: 0.40em solid #f8f9fa;
+  padding: 1rem 2rem 2rem 2rem;
+  margin-top: 3%;
+  width: 100%;
+  min-width: 25rem;
 }
 
 .btn-profiles {
-    padding: 0.5rem;
+  padding: 0.5rem;
 }
+/* previous css --- end*/
