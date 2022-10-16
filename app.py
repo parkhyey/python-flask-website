@@ -68,18 +68,20 @@ def profile():
     if request.method == "POST":
 
         if request.form.get("Add_Profile"):
-            print("enter add_profile")
             profile_name = request.form["name"]
             profile_type = request.form["type"]
             profile_breed = request.form["breed"]
-            profile_disposition = request.form["disposition"]
+            profile_dispositions = request.form.getlist("disposition")
             profile_availability = request.form["availability"]
             profile_news = request.form["news"]
             profile_description = request.form["description"]
 
+            # Join multiple entries for dispositions
+            join_dispositions = ', '.join(profile_dispositions)
+
             profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description) VALUES (%s, %s, %s, %s, %s, %s, %s)"
             cur = db_connection.cursor()
-            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description))
+            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, join_dispositions, profile_availability, profile_news, profile_description))
             db_connection.commit()
 
         return redirect("/manage-profiles")

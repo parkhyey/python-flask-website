@@ -23,7 +23,7 @@
                   <option value="Dog">Dog</option>
                   <option value="Other">Other</option>
                 </select>
-              </div>
+              </div> <br>
               <div class="form-group">
                 <label for="breed">Breed:</label>
                 <select class="form-select" name="breed">
@@ -64,14 +64,34 @@
                   </optgroup>
                 </select>
               </div>
-              <div class="form-group">
+              <!-- <div class="form-group">
                 <label for="type">Disposition</label>
                 <select class="form-select" name="disposition">
                   <option value="Good with other animals">Good with other animals</option>
                   <option value="Good with children">Good with children</option>
                   <option value="Animal must be leashed at all times">Animal must be leashed at all times</option>
                 </select>
+              </div> -->
+              <br>
+              <label for="type">Disposition:</label>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Good with other animals" id="disposition" name="disposition">
+                <label class="form-check-label" for="goodWithOtherAnimals">
+                  Good with other Animals
+                </label>
               </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Good with children" id="disposition" name="disposition">
+                <label class="form-check-label" for="goodWithChildren">
+                  Good with children
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="Animal must be leashed at all times" id="disposition" name="disposition">
+                <label class="form-check-label" for="animalMustBeLeashedAtAllTimes">
+                  Animal must be leashed at all times
+                </label>
+              </div> <br>
               <div class="form-group">
                 <label for="type">Availability:</label>
                   <select class="form-select" name="availability">
@@ -80,7 +100,7 @@
                     <option value="Pending">Pending</option>
                     <option value="Adopted">Adopted</option>
                   </select>
-              </div>
+              </div> <br>
               <div class="form-label">
                 <label for="type">News:</label>
                 <input
@@ -96,8 +116,12 @@
                   class="form-control"
                   name="description"
                 />
+              </div> <br>
+              <div class="custom-file">
+                <input type="file" class="custom-file-input">
+                <label class="custom-file-label">Upload a Picture...</label>
               </div>
-              <div class="d-flex flex-row align-items-center justify-content-between">
+              <div class="d-flex flex-row align-items-center justify-content-center">
                 <input class="btn btn-primary" type="submit" value="Create" name="Add_Profile">
               </div>
             </form>
