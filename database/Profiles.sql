@@ -17,5 +17,9 @@ INSERT INTO Profiles(profile_name, profile_type, profile_breed, profile_disposit
 VALUES 
     ("Layla", "Cat", "Siamese", "Good with other animals", "Available", "Newly added!", "Small size, long tail, white with brown paws"),
     ("March", "Dog", "Golden Retriever", "Good with children", "Available", "Newly added!", "Large size, light golden fur"),
-    ("Ram", "Other", "N/A", "Good with children", "Available", "Newly added!", "Small size, black goat")
+    ("Ram", "Other", "N/A", "Good with children", "Available", "Newly added!", "Small size, black goat"),
+	("Luna", "Cat", "Himalayan", "Good with children", "Pending", "Newly added!", "Small size, long tail, orange with black spots"),
+	("Hammie", "Other", "Hamster", "Good with children", "Available", "Newly added!", "Small size, long haired, brown fur"),
+	("Buster", "Dog", "German Shepherd", "Good with other animals", "Not available", "Newly added!", "Big size, tan fur"),
+	("Benji", "Dog", "Pomeranian", "Good with other animals", "Available", "Newly added!", "Small size, black and white fur")
 ;
