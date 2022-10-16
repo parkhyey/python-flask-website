@@ -20,6 +20,7 @@
                       <th>Disposition</th>
                       <th>Availability</th>
                       <th>Description</th>
+                      <th>Image</th>
                       <th></th>
                       <th></th>
                     </tr>
@@ -34,6 +35,7 @@
                       <td>{{ item['profile_disposition'] }}</td>
                       <td>{{ item['profile_availability'] }}</td>
                       <td>{{ item['profile_description'] }}</td>
+                      <td><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></td>
                       <td><button class="btn-profiles"><a href="#">EDIT</a></button></td>
                       <td><button class="btn-profiles"><a href="#">DELETE</a></button></td>
                     </tr>

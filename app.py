@@ -8,7 +8,6 @@ import datetime
 app = Flask(__name__)
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
-
 # Routes
 # Home
 @app.route("/")
