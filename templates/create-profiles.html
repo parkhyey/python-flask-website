@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container">
+    <div class="row justify-content-center">
+      <div>
+        <div class="card">
+          <h3 class="card-title text-center">CREATE PROFILE</h3>
+          <div class="card-body py-md-4">
+            <form id="insertPerson" action="/profiles" method="post">
+              <div class="form-label">
+                <label for="type">Name:</label>
+                <input
+                  type="text"
+                  class="form-control "
+                  name="name"
+                />
+              </div>
+              <div class="form-group">
+                <label for="type">Type:</label>
+                <select class="form-select" name="type">
+                  <option value="Cat">Cat</option>
+                  <option value="Dog">Dog</option>
+                  <option value="Other">Other</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="breed">Breed:</label>
+                <select class="form-select" name="breed">
+                  <optgroup label="Dog">
+                    <option value="Labrador Retriever">Labrador Retriever</option>
+                    <option value="German Shepherd">German Shepherd</option>
+                    <option value="Golden Retriever">Golden Retriever</option>
+                    <option value="French Bulldog">French Bulldog</option>
+                    <option value="Bulldog">Bulldog</option>
+                    <option value="Beagle">Beagle</option>
+                    <option value="Poodle">Poodle</option>
+                    <option value="Rottweiler">Rottweiler</option>
+                    <option value="Yorkshire Terrier">Yorkshire Terrier</option>
+                    <option value="German Shorthaired Pointer">German Shorthaired Pointer</option>
+                    <option value="Other">Other</option>
+                  </optgroup>
+                  <optgroup label="Cat">
+                    <option value="Siamese">Siamese</option>
+                    <option value="Persiam">Persian</option>
+                    <option value="Maine coon">Maine Coon</option>
+                    <option value="Ragdoll">Ragdoll</option>
+                    <option value="Bengal">Bengal</option>
+                    <option value="Abyssinian">Abyssinian</option>
+                    <option value="Birman">Birman</option>
+                    <option value="American shorthair">American Shorthair</option>
+                    <option value="Sphynx">Sphynx</option>
+                    <option value="Himalayan">Himalayan</option>
+                    <option value="Other">Other</option>
+                  </optgroup>
+                  <optgroup label="Exotic">
+                    <option value="Hamster">Hamster</option>
+                    <option value="Rabbit">Rabbit</option>
+                    <option value="Turtle">Turtle</option>
+                    <option value="Guinea Pig">Guinea Pig</option>
+                    <option value="Ferret">Ferret</option>
+                    <option value="Parrot">Parrot</option>
+                    <option value="Poodle">Other</option>
+                  </optgroup>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="type">Disposition</label>
+                <select class="form-select" name="disposition">
+                  <option value="Good with other animals">Good with other animals</option>
+                  <option value="Good with children">Good with children</option>
+                  <option value="Animal must be leashed at all times">Animal must be leashed at all times</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="type">Availability:</label>
+                  <select class="form-select" name="availability">
+                    <option value="Not Available">Not Available</option>
+                    <option value="Available">Available</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Adopted">Adopted</option>
+                  </select>
+              </div>
+              <div class="form-label">
+                <label for="type">News:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="news" 
+                />
+              </div>
+              <div class="form-group">
+                <label for="type">Description:</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="description"
+                />
+              </div>
+              <div class="d-flex flex-row align-items-center justify-content-between">
+                <input class="btn btn-primary" type="submit" value="Create" name="Add_Profile">
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{%  endblock %}

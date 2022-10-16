@@ -1,5 +1,5 @@
 # Dependencies
-from flask import Flask, render_template
+from flask import Flask, render_template, request, redirect
 import os
 import database.db_connector as db
 import datetime
@@ -7,6 +7,7 @@ import datetime
 # Configuration
 app = Flask(__name__)
 app.permanent_session_lifetime = datetime.timedelta(days=365)
+
 
 # Routes
 # Home
@@ -58,6 +59,30 @@ def manage():
 
     db_connection.close()    
     return render_template("manage-profiles.html", items=profiles_results)
+
+# Create profile
+@app.route("/profiles", methods=["GET", "POST"])
+def profile():
+    db_connection = db.connect_to_database()
+
+    if request.method == "POST":
+
+        if request.form.get("Add_Profile"):
+            print("enter add_profile")
+            profile_name = request.form["name"]
+            profile_type = request.form["type"]
+            profile_breed = request.form["breed"]
+            profile_disposition = request.form["disposition"]
+            profile_availability = request.form["availability"]
+            profile_news = request.form["news"]
+            profile_description = request.form["description"]
+
+            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            cur = db_connection.cursor()
+            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description))
+            db_connection.commit()
+
+        return redirect("/manage-profiles")
 
 # Listener
 if __name__ == "__main__":
