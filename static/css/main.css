@@ -170,6 +170,15 @@ a:focus {
   text-align: right;
 }
 
+.nav-bg {
+  background-color: rgb(40, 65, 133);
+  color: white;
+}
+
+.navbar-nav .nav-link.active, .nav-link {
+  color: white;
+}
+
 .navbutton {
   background-color: rgb(40, 65, 133);
   color: white;
