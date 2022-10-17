@@ -57,7 +57,8 @@ def create():
 def manage():
     db_connection = db.connect_to_database()
     # select all records from Instructors table joined with Campuses
-    profiles_query = "SELECT * FROM Profiles;"
+    # profiles_query = "SELECT * FROM Profiles;"
+    profiles_query = "SELECT Profiles.profile_id, Profiles.profile_name, Profiles.profile_type, Profiles.profile_breed, GROUP_CONCAT(Dispositions.disposition_value), Profiles.profile_availability, Profiles.profile_news, Profiles.profile_description, Profiles.profile_image FROM Profiles_Dispositions JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id GROUP BY Profiles.profile_id;"
     profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_query)
     profiles_results = profiles_cursor.fetchall()
 
@@ -75,7 +76,9 @@ def profile():
             profile_name = request.form["name"]
             profile_type = request.form["type"]
             profile_breed = request.form["breed"]
-            profile_dispositions = request.form.getlist("disposition")
+            profile_disposition1 = request.form.getlist("disposition1")
+            profile_disposition2 = request.form.getlist("disposition2")
+            profile_disposition3 = request.form.getlist("disposition3")
             profile_availability = request.form["availability"]
             profile_news = request.form["news"]
             profile_description = request.form["description"]
@@ -85,12 +88,22 @@ def profile():
             filename = picture.filename
             picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
-            # Join multiple entries for dispositions
-            join_dispositions = ', '.join(profile_dispositions)
-
-            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description, profile_image) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            # Insert into Profiles table
+            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image) VALUES (%s, %s, %s, %s, %s, %s, %s); SET @profile_id = LAST_INSERT_ID()"
             cur = db_connection.cursor()
-            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, join_dispositions, profile_availability, profile_news, profile_description, filename))
+            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, filename))
+
+            # Insert into Profiles_Dispositions table
+            disposition_query = "INSERT INTO Profiles_Dispositions (profile_id, disposition_id) VALUES (@profile_id, %s);"
+            cur = db_connection.cursor()
+
+            if profile_disposition1:
+                cur.execute(disposition_query, profile_disposition1)
+            if profile_disposition2:
+                cur.execute(disposition_query, profile_disposition2)
+            if profile_disposition3:
+                cur.execute(disposition_query, profile_disposition3)
+        
             db_connection.commit()
 
         db_connection.close()

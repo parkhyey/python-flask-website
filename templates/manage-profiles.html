@@ -32,7 +32,7 @@
                       <td>{{ item['profile_name'] }}</td>
                       <td>{{ item['profile_type'] }}</td>
                       <td>{{ item['profile_breed'] }}</td>
-                      <td>{{ item['profile_disposition'] }}</td>
+                      <td>{{ item['GROUP_CONCAT(Dispositions.disposition_value)'] }}</td>
                       <td>{{ item['profile_availability'] }}</td>
                       <td>{{ item['profile_description'] }}</td>
                       <td><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></td>
