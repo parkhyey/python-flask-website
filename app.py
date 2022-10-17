@@ -4,8 +4,13 @@ import os
 import database.db_connector as db
 import datetime
 
+# Define Upload folder
+UPLOAD_FOLDER = "static/img/profile"
+ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
+
 # Configuration
 app = Flask(__name__)
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 
 # Routes
@@ -74,15 +79,21 @@ def profile():
             profile_availability = request.form["availability"]
             profile_news = request.form["news"]
             profile_description = request.form["description"]
+            picture = request.files["picture"]
+
+            # Save uploaded picture
+            filename = picture.filename
+            picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             # Join multiple entries for dispositions
             join_dispositions = ', '.join(profile_dispositions)
 
-            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description) VALUES (%s, %s, %s, %s, %s, %s, %s)"
+            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_disposition, profile_availability, profile_news, profile_description, profile_image) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
             cur = db_connection.cursor()
-            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, join_dispositions, profile_availability, profile_news, profile_description))
+            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, join_dispositions, profile_availability, profile_news, profile_description, filename))
             db_connection.commit()
 
+        db_connection.close()
         return redirect("/manage-profiles")
 
 # Listener

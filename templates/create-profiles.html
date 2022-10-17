@@ -7,7 +7,7 @@
         <div class="card">
           <h3 class="card-title text-center">CREATE PROFILE</h3>
           <div class="card-body py-md-4">
-            <form id="insertPerson" action="/profiles" method="post">
+            <form id="insertPerson" action="/profiles" method="post" enctype="multipart/form-data">
               <div class="form-label">
                 <label for="type">Name:</label>
                 <input
@@ -118,7 +118,7 @@
                 />
               </div> <br>
               <div class="custom-file">
-                <input type="file" class="custom-file-input">
+                <input type="file" class="custom-file-input" name="picture">
                 <label class="custom-file-label">Upload a Picture...</label>
               </div>
               <div class="d-flex flex-row align-items-center justify-content-center">
