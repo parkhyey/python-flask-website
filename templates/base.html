@@ -12,8 +12,23 @@
   </head>
   <body>
     <!-- navbar placeholder-->
-    <div id="navbar">
-    </div>
+    <nav class="navbar navbar-dark navbar-expand-lg nav-bg">
+      <div class="container-fluid">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link" href="/signup">Sign Up</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Sign In</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
 
     <!-- page header placeholder-->
     <div id="header">
@@ -23,7 +38,6 @@
     {% endblock %}
 
     <!-- javascript -->
-    <script src="../static/nav.js"></script>
     <script src="../static/header.js"></script>
     <!-- JavaScript Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
