@@ -1,3 +1,7 @@
+-- Sample Data for testing
+-- Drop tables if they exist
+DROP TABLE IF EXISTS Profiles_Dispositions;
+
 CREATE TABLE Profiles_Dispositions (
     profile_disposition_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     profile_id INT,

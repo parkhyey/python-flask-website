@@ -2,6 +2,10 @@
 -- Drop tables if they exist
 DROP TABLE IF EXISTS Users;
 
+-- Sample Data for testing
+-- Drop tables if they exist
+DROP TABLE IF EXISTS Users;
+
 CREATE TABLE Users (
     user_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     user_fname VARCHAR(255) NOT NULL,

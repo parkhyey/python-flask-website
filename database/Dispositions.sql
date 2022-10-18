@@ -1,3 +1,7 @@
+-- Sample Data for testing
+-- Drop tables if they exist
+DROP TABLE IF EXISTS Dispositions;
+
 CREATE TABLE Dispositions (
     disposition_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     disposition_value VARCHAR(255) NOT NULL
