@@ -72,6 +72,7 @@ a,
 a:hover,
 a:focus {
   text-decoration: none;
+  color: inherit
 }
 
 .section {
@@ -144,11 +145,20 @@ a:focus {
   transition: 0.2s;
 }
 
+/* flash error messages */
+.error {
+  color: red
+}
+
+.right-align {
+  text-align: right;
+}
+
 /* previous css --- start*/
 #header {
   text-align: center;
   font-size: 65px;
-  padding-top: 10px;
+  padding-top: 20px;
   font-family: 'Merienda';
   font-weight: 700;
 }
@@ -269,10 +279,6 @@ a:focus {
   color: black;
 }
 
-.tables {
-  text-align: center;
-}
-
 table,
 th,
 td {
@@ -283,6 +289,7 @@ td {
 
 table {
   width: 100%;
+  text-align: center;
 }
 
 .card-profiles {
