@@ -19,6 +19,7 @@
                       <th>Breed</th>
                       <th>Disposition</th>
                       <th>Availability</th>
+                      <td>News</td>
                       <th>Description</th>
                       <th>Image</th>
                       <th></th>
@@ -34,6 +35,7 @@
                       <td>{{ item['profile_breed'] }}</td>
                       <td>{{ item['GROUP_CONCAT(Dispositions.disposition_value)'] }}</td>
                       <td>{{ item['profile_availability'] }}</td>
+                      <td>{{ item['profile_news'] }}</td>
                       <td>{{ item['profile_description'] }}</td>
                       <td><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></td>
                       <td><button class="btn-profiles"><a href="#">EDIT</a></button></td>

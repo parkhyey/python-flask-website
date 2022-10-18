@@ -15,11 +15,11 @@ CREATE TABLE Profiles(
 
 INSERT INTO Profiles(profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image) 
 VALUES 
-    ("Layla", "Cat", "Siamese", "Good with other animals", "Available", "Small size, long tail, white with brown paws", "siamese.jpg"),
-    ("March", "Dog", "Golden Retriever", "Good with children", "Available", "Large size, light golden fur", "golden.jpg"),
-    ("Ram", "Other", "N/A", "Good with children", "Available", "Small size, white goat", "goat.jpg"),
-	("Luna", "Cat", "Persian", "Good with children", "Pending", "Small size, long tail, orange with black spots", "persian.jpg"),
-	("Hammie", "Other", "Hamster", "Good with children", "Available", "Small size, long haired, brown fur", "hamster.jpg"),
-	("Buster", "Dog", "German Shepherd", "Good with other animals", "Not available", "Big size, tan fur", "gsd.jpg"),
-	("Benji", "Dog", "Pomeranian", "Good with other animals", "Available", "Small size, black and white fur", "pom.jpg")
+    ("Layla", "Cat", "Siamese", "Available", "She just arrived at the shelter!", "Small size, long tail, white with brown paws", "siamese.jpg"),
+    ("March", "Dog", "Golden Retriever", "Available", "Newly Available for adoption!","Large size, light golden fur", "golden.jpg"),
+    ("Ram", "Other", "N/A", "Available", "He likes to sleep", "Small size, white goat", "goat.jpg"),
+	("Luna", "Cat", "Persian", "Pending", "Just adopted!", "Small size, long tail, orange with black spots", "persian.jpg"),
+	("Hammie", "Other", "Hamster", "Available", "He likes to stash food", "Small size, long haired, brown fur", "hamster.jpg"),
+	("Buster", "Dog", "German Shepherd", "Not available", "Just adopted!", "Big size, tan fur", "gsd.jpg"),
+	("Benji", "Dog", "Pomeranian", "Available", "Still available for adoption! He's a sweetheart", "Small size, black and white fur", "pom.jpg")
 ;
