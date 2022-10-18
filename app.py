@@ -1,5 +1,5 @@
 # Dependencies
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 import database.db_connector as db
 import datetime
@@ -12,6 +12,7 @@ ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.permanent_session_lifetime = datetime.timedelta(days=365)
+app.secret_key = "secret"  
 
 # Routes
 # Home
@@ -56,14 +57,35 @@ def create():
 @app.route("/manage-profiles", methods=["GET", "POST"])
 def manage():
     db_connection = db.connect_to_database()
-    # select all records from Instructors table joined with Campuses
-    # profiles_query = "SELECT * FROM Profiles;"
     profiles_query = "SELECT Profiles.profile_id, Profiles.profile_name, Profiles.profile_type, Profiles.profile_breed, GROUP_CONCAT(Dispositions.disposition_value), Profiles.profile_availability, Profiles.profile_news, Profiles.profile_description, Profiles.profile_image FROM Profiles_Dispositions JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id GROUP BY Profiles.profile_id;"
     profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_query)
     profiles_results = profiles_cursor.fetchall()
 
     db_connection.close()    
     return render_template("manage-profiles.html", items=profiles_results)
+
+@app.route("/delete-profiles/<int:id>")
+def delete_profiles(id):
+    """Delete an animal profile from the Profiles table"""
+    db_connection = db.connect_to_database()
+    data = (id,)
+    select_query = "SELECT * FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
+    select_cursor = db.execute_query(db_connection=db_connection, query=select_query, query_params=data)
+    select_results = select_cursor.fetchall()
+    # verify if result exists
+    if len(select_results) == 0:
+        # flash error messages
+        flash("To delete a profile, the profile availability must be 'Not available'.", 'error')
+    else:
+        delete_profiles_disposition_query = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s;"
+        delete_profiles_query = "DELETE FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
+        delete_profiles_disposition_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_disposition_query, query_params=data)
+        delete_profiles_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_query, query_params=data)
+        # flash success messages
+        flash("You have deleted profile id #" + str(id) + ".")
+
+    db_connection.close()
+    return redirect(url_for('manage'))
 
 # Create profile
 @app.route("/profiles", methods=["GET", "POST"])
