@@ -1,53 +1,56 @@
-    {% extends 'base.html' %}
+{% extends 'base.html' %}
 
-    {% block main %}
-    <div class="container">
-      <div class="row justify-content-center">
-        <div>
-          <div class="card-profiles">
-            <h3 class="card-title text-center">MANAGE PROFILES</h3>
-            <div class="card-body py-md-4">
-              <!-- testing -->
-              <!-- Table -->
-              <div id="container">
-                <table class="tables" id="profile-table">
-                  <thead>
-                    <tr>
-                      <th>Profile ID</th>
-                      <th>Name</th>
-                      <th>Type</th>
-                      <th>Breed</th>
-                      <th>Disposition</th>
-                      <th>Availability</th>
-                      <td>News</td>
-                      <th>Description</th>
-                      <th>Image</th>
-                      <th></th>
-                      <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {% for item in items %}
-                    <tr>
-                      <td>{{ item['profile_id'] }}</td>
-                      <td>{{ item['profile_name'] }}</td>
-                      <td>{{ item['profile_type'] }}</td>
-                      <td>{{ item['profile_breed'] }}</td>
-                      <td>{{ item['GROUP_CONCAT(Dispositions.disposition_value)'] }}</td>
-                      <td>{{ item['profile_availability'] }}</td>
-                      <td>{{ item['profile_news'] }}</td>
-                      <td>{{ item['profile_description'] }}</td>
-                      <td><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></td>
-                      <td><button class="btn-profiles"><a href="#">EDIT</a></button></td>
-                      <td><button class="btn-profiles"><a href="#">DELETE</a></button></td>
-                    </tr>
-                    {% endfor %}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
+{% block main %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="card-profiles">
+      <h3 class="card-title text-center">MANAGE PROFILES</h3>
+      <div class="right-align"><button class="btn-profiles"><a href="/create-profiles">ADD NEW PROFILE</a></button></div>
+      <div class="card-body py-md-4">
+        <!-- flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="{{ category }}">{{ message }}</div>
+          {% endfor %}
+        {% endwith %} 
+        <!-- Table -->
+        <div id="container">
+          <table id="profile-table">
+            <thead>
+              <tr>
+                <th>Profile ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Breed</th>
+                <th>Disposition</th>
+                <th>Availability</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th></th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in items %}
+              <tr>
+                <td>{{ item['profile_id'] }}</td>
+                <td>{{ item['profile_name'] }}</td>
+                <td>{{ item['profile_type'] }}</td>
+                <td>{{ item['profile_breed'] }}</td>
+                <td>{{ item['GROUP_CONCAT(Dispositions.disposition_value)'] }}</td>
+                <td>{{ item['profile_availability'] }}</td>
+                <td>{{ item['profile_description'] }}</td>
+                <td><a href="../static/img/profile/{{ item['profile_image'] }}"><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></a></td>
+                <td><button class="btn-profiles"><a href="#">EDIT</a></button></td>
+                <td><button class="btn-profiles" 
+                  onclick="window.location='/delete-profiles/{{ item['profile_id'] }}'">DELETE</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
-    {%  endblock %}
+  </div>
+</div>
+{%  endblock %}
