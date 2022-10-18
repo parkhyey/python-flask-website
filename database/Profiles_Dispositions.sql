@@ -6,3 +6,13 @@ CREATE TABLE Profiles_Dispositions (
     FOREIGN KEY (disposition_id) REFERENCES Dispositions(disposition_id)
 ) ENGINE = InnoDB;
 
+INSERT INTO Profiles_Dispositions(profile_id, disposition_id) 
+VALUES
+    (1,1),
+    (2,1),
+    (3,1),
+    (4,2),
+    (4,3),
+    (5,3),
+    (6,2)
+;
