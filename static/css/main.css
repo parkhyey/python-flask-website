@@ -150,6 +150,10 @@ a:focus {
   color: red
 }
 
+.success {
+  color: green
+}
+
 .right-align {
   text-align: right;
 }

@@ -126,11 +126,14 @@ def profile():
             if profile_disposition3:
                 cur.execute(disposition_query, profile_disposition3)
 
+            # At least one disposition is not selected
             if len(profile_disposition1) == 0 and len(profile_disposition2) == 0 and len(profile_disposition3) == 0:
                 flash("Please select at least one disposition", 'error')
                 return redirect("/create-profiles")
             else: 
                 db_connection.commit()
+                # Success message
+                flash("Your profile has been created!", 'success')
                 db_connection.close()
                 return redirect("/manage-profiles")
 
