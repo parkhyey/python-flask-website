@@ -125,11 +125,14 @@ def profile():
                 cur.execute(disposition_query, profile_disposition2)
             if profile_disposition3:
                 cur.execute(disposition_query, profile_disposition3)
-        
-            db_connection.commit()
 
-        db_connection.close()
-        return redirect("/manage-profiles")
+            if len(profile_disposition1) == 0 and len(profile_disposition2) == 0 and len(profile_disposition3) == 0:
+                flash("Please select at least one disposition", 'error')
+                return redirect("/create-profiles")
+            else: 
+                db_connection.commit()
+                db_connection.close()
+                return redirect("/manage-profiles")
 
 # Listener
 if __name__ == "__main__":
