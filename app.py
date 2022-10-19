@@ -8,6 +8,9 @@ import datetime
 UPLOAD_FOLDER = "static/img/profile"
 ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
 
+# Sample images
+SAMPLE_IMAGES = ['goat.jpg', 'golden.jpg', 'gsd.jpg', 'hamster.jpg', 'persian.jpg', 'pom.jpg', 'poodle.jpg', 'siamese.jpg']
+
 # Configuration
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -72,6 +75,7 @@ def delete_profiles(id):
     select_query = "SELECT * FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
     select_cursor = db.execute_query(db_connection=db_connection, query=select_query, query_params=data)
     select_results = select_cursor.fetchall()
+    profile_img = ""
     # verify if result exists
     if len(select_results) == 0:
         # flash error messages
@@ -87,8 +91,10 @@ def delete_profiles(id):
         flash("You have deleted profile id #" + str(id) + ".")
 
     # delete the select image file if exists
-    if os.path.exists(UPLOAD_FOLDER+"/"+profile_img):
-        os.remove(UPLOAD_FOLDER+"/"+profile_img)
+    if profile_img and os.path.exists(UPLOAD_FOLDER+"/"+profile_img):
+        # ignore the sample images
+        if not profile_img in SAMPLE_IMAGES:
+            os.remove(UPLOAD_FOLDER+"/"+profile_img)
 
     db_connection.close()
     return redirect(url_for('manage'))
