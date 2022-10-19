@@ -77,12 +77,18 @@ def delete_profiles(id):
         # flash error messages
         flash("To delete a profile, the profile availability must be 'Not available'.", 'error')
     else:
+        # get image file name
+        profile_img = select_results[0].get('profile_image')
         delete_profiles_disposition_query = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s;"
         delete_profiles_query = "DELETE FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
         delete_profiles_disposition_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_disposition_query, query_params=data)
         delete_profiles_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_query, query_params=data)
         # flash success messages
         flash("You have deleted profile id #" + str(id) + ".")
+
+    # delete the select image file if exists
+    if os.path.exists(UPLOAD_FOLDER+"/"+profile_img):
+        os.remove(UPLOAD_FOLDER+"/"+profile_img)
 
     db_connection.close()
     return redirect(url_for('manage'))
