@@ -55,9 +55,26 @@ def news():
 
 @app.route("/create-profiles")
 def create():
-    return render_template("create-profiles.html")
+    db_connection = db.connect_to_database()
+    cur = db_connection.cursor()
 
-@app.route("/manage-profiles", methods=["GET", "POST"])
+    disp_qry = "SELECT * FROM Dispositions"
+    cur.execute(disp_qry)
+    disp = cur.fetchall()
+
+    animal_qry = "SELECT * FROM Animals"
+    cur.execute(animal_qry)
+    animals = cur.fetchall()
+
+    data = {
+        "dispositions": disp,
+        "animals": animals
+    }
+
+    db_connection.close()
+    return render_template("create-profiles.html", data=data)
+
+@app.route("/manage-profiles", methods=["GET"])
 def manage():
     db_connection = db.connect_to_database()
     profiles_query = "SELECT Profiles.profile_id, Profiles.profile_name, Profiles.profile_type, Profiles.profile_breed, GROUP_CONCAT(Dispositions.disposition_value), Profiles.profile_availability, Profiles.profile_news, Profiles.profile_description, Profiles.profile_image FROM Profiles_Dispositions JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id GROUP BY Profiles.profile_id;"
@@ -99,6 +116,24 @@ def delete_profiles(id):
     db_connection.close()
     return redirect(url_for('manage'))
 
+
+def get_profile_form_values(request):
+    return {
+        "name": request.form["name"],
+        "type": request.form["type"],
+        "breed": request.form["breed"],
+        "dispositions": {
+            "1": request.form.getlist("disposition1"),
+            "2": request.form.getlist("disposition2"),
+            "3": request.form.getlist("disposition3"),
+        },
+        "availability": request.form["availability"],
+        "news": request.form["news"],
+        "description": request.form["description"],
+        "picture": request.files.get("picture", None)
+    }
+
+
 # Create profile
 @app.route("/profiles", methods=["GET", "POST"])
 def profile():
@@ -107,39 +142,30 @@ def profile():
     if request.method == "POST":
 
         if request.form.get("Add_Profile"):
-            profile_name = request.form["name"]
-            profile_type = request.form["type"]
-            profile_breed = request.form["breed"]
-            profile_disposition1 = request.form.getlist("disposition1")
-            profile_disposition2 = request.form.getlist("disposition2")
-            profile_disposition3 = request.form.getlist("disposition3")
-            profile_availability = request.form["availability"]
-            profile_news = request.form["news"]
-            profile_description = request.form["description"]
-            picture = request.files["picture"]
+            _profile = get_profile_form_values(request)
 
             # Save uploaded picture
-            filename = picture.filename
-            picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            filename = _profile["picture"].filename
+            _profile["picture"].save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
 
             # Insert into Profiles table
             profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image) VALUES (%s, %s, %s, %s, %s, %s, %s); SET @profile_id = LAST_INSERT_ID()"
             cur = db_connection.cursor()
-            cur.execute(profiles_query, (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, filename))
+            cur.execute(profiles_query, (_profile["name"], _profile["type"], _profile["breed"], _profile["availability"], _profile["news"], _profile["description"], filename))
 
             # Insert into Profiles_Dispositions table
             disposition_query = "INSERT INTO Profiles_Dispositions (profile_id, disposition_id) VALUES (@profile_id, %s);"
             cur = db_connection.cursor()
 
-            if profile_disposition1:
-                cur.execute(disposition_query, profile_disposition1)
-            if profile_disposition2:
-                cur.execute(disposition_query, profile_disposition2)
-            if profile_disposition3:
-                cur.execute(disposition_query, profile_disposition3)
+            if _profile["dispositions"]["1"]:
+                cur.execute(disposition_query, _profile["dispositions"]["1"])
+            if _profile["dispositions"]["2"]:
+                cur.execute(disposition_query, _profile["dispositions"]["2"])
+            if _profile["dispositions"]["3"]:
+                cur.execute(disposition_query, _profile["dispositions"]["3"])
 
             # At least one disposition is not selected
-            if len(profile_disposition1) == 0 and len(profile_disposition2) == 0 and len(profile_disposition3) == 0:
+            if len(_profile["dispositions"]["1"]) == 0 and len(_profile["dispositions"]["2"]) == 0 and len(_profile["dispositions"]["3"]) == 0:
                 flash("Please select at least one disposition", 'error')
                 return redirect("/create-profiles")
             else: 
@@ -148,6 +174,109 @@ def profile():
                 flash("Your profile has been created!", 'success')
                 db_connection.close()
                 return redirect("/manage-profiles")
+
+
+@app.route('/profiles/<int:id>', methods=["GET", "PUT"])
+def profile_id(id):
+    if request.method == "GET":
+        db_connection = db.connect_to_database()
+        cur = db_connection.cursor()
+
+        curr_profile_qry = "SELECT * FROM Profiles WHERE profile_id = %s"
+        cur.execute(curr_profile_qry, (int(id),))
+        curr_profile = cur.fetchone()
+
+        profile_disp_qry = """SELECT d.* 
+            FROM Dispositions d
+            JOIN Profiles_Dispositions pd ON d.disposition_id = pd.disposition_id
+            JOIN Profiles p ON p.profile_id = pd.profile_id
+            WHERE p.profile_id = %s"""
+        cur.execute(profile_disp_qry, (int(id),))
+        profile_disp = cur.fetchall()
+
+        disp_qry = "SELECT * FROM Dispositions"
+        cur.execute(disp_qry)
+        disp = cur.fetchall()
+
+        animal_qry = "SELECT * FROM Animals"
+        cur.execute(animal_qry)
+        animals = cur.fetchall()
+
+        data = {
+            "profile": curr_profile,
+            "profile_dispositions": profile_disp,
+            "dispositions": disp,
+            "animals": animals
+        }
+        db_connection.close()
+        return render_template("create-profiles.html", data=data)
+    elif request.method == "PUT":
+        db_connection = db.connect_to_database()
+        cur = db_connection.cursor()
+
+        if request.form.get("name"):
+            _profile = get_profile_form_values(request)
+
+            # At least one disposition is not selected
+            if len(_profile["dispositions"]["1"]) == 0 and len(
+                    _profile["dispositions"]["2"]) == 0 and len(
+                    _profile["dispositions"]["3"]) == 0:
+                flash("Please select at least one disposition", 'error')
+                return redirect("/profiles/" + id)
+
+            # Get existing profile
+            curr_profile_qry = "SELECT * FROM Profiles WHERE profile_id = %s"
+            cur.execute(curr_profile_qry, (int(id),))
+            curr_profile = cur.fetchone()
+            curr_img = curr_profile[7]
+
+            filename = "";
+            if len(_profile["picture"].filename) > 0:
+                filename = _profile["picture"].filename
+                # if picture is being changed
+                if curr_img != filename:
+                    # save the new image
+                    _profile["picture"].save(os.path.join(UPLOAD_FOLDER, filename))
+                    # delete the old image if it exists and is not a sample image
+                    if curr_img not in SAMPLE_IMAGES and os.path.exists(
+                            os.path.join(UPLOAD_FOLDER, curr_img)):
+                        os.remove(os.path.join(UPLOAD_FOLDER, curr_img))
+            else:
+                filename = curr_img
+
+            # delete dispositions and resave them to update
+            disp_delete_qry = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s"
+            cur.execute(disp_delete_qry, (int(id),))
+
+            # add dispositions
+            disp_add_qry = "INSERT INTO Profiles_Dispositions (profile_id, disposition_id) VALUES (%s, %s)"
+            if _profile["dispositions"]["1"]:
+                cur.execute(disp_add_qry, (id, _profile["dispositions"]["1"]))
+            if _profile["dispositions"]["2"]:
+                cur.execute(disp_add_qry, (id, _profile["dispositions"]["2"]))
+            if _profile["dispositions"]["3"]:
+                cur.execute(disp_add_qry, (id, _profile["dispositions"]["3"]))
+
+            # update profile
+            profile_qry = """UPDATE Profiles SET profile_name = %s, 
+                profile_type = %s, profile_breed = %s, profile_availability=%s,
+                profile_news=%s, profile_description=%s, profile_image=%s 
+                WHERE profile_id=%s"""
+            if _profile["picture"] is None:
+                _profile["picture"] = curr_img
+            cur.execute(profile_qry, (_profile["name"], _profile["type"],
+                                      _profile["breed"],
+                                      _profile["availability"],
+                                      _profile["news"],
+                                      _profile["description"], filename,
+                                      int(id)))
+
+            db_connection.commit()
+
+            flash("Your profile has been updated!", 'success')
+            db_connection.close()
+            return { "Result": "Success" }, 200
+
 
 # Listener
 if __name__ == "__main__":

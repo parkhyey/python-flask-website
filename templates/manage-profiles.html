@@ -41,9 +41,10 @@
                 <td>{{ item['profile_availability'] }}</td>
                 <td>{{ item['profile_description'] }}</td>
                 <td><a href="../static/img/profile/{{ item['profile_image'] }}"><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></a></td>
-                <td><button class="btn-profiles"><a href="#">EDIT</a></button></td>
+                <td><button class="btn-profiles"
+                  onclick="window.location='/profiles/{{ item['profile_id'] }}'">EDIT</button></td>
                 <td><button class="btn-profiles" 
-                  onclick="window.location='/delete-profiles/{{ item['profile_id'] }}'">DELETE</td>
+                            onclick="window.location='/delete-profiles/{{ item['profile_id'] }}'">DELETE</button></td>
               </tr>
               {% endfor %}
             </tbody>
