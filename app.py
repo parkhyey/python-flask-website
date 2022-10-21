@@ -1,5 +1,5 @@
 # Dependencies
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 import database.db_connector as db
 import datetime
@@ -37,9 +37,87 @@ def index_user():
 def signup():
     return render_template("signup.html")
 
-@app.route("/login")
+@app.route("/user-profile")
+def user_profile():
+
+    return render_template("user-profile.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    db_connection = db.connect_to_database()
+
+    if request.method == "POST":
+
+        if request.form.get("Register_User"):
+            user_fname = request.form["fname"]
+            user_lname = request.form["lname"]
+            user_email = request.form["email"]
+            user_password = request.form["password"]
+            user_password_confirmation = request.form["confirmation"]
+            user_is_admin = request.form["admin"]
+
+            # Select Users table for account verifcation
+            users_select_query = "SELECT * FROM Users WHERE user_email = %s"
+
+            cur = db_connection.cursor()
+            cur.execute(users_select_query, (user_email, ))
+
+            account = cur.fetchone()
+
+            if account:
+                flash("Account already exists!", 'error')
+                return redirect("/signup")
+            elif user_password_confirmation == user_password:
+                # Insert into Users table
+                users_insert_query = "INSERT INTO Users (user_fname, user_lname, user_email, user_password, user_is_admin) VALUES (%s, %s, %s, SHA1(%s), %s);"
+
+                cur.execute(users_insert_query, (user_fname, user_lname, user_email, user_password, user_is_admin))
+
+                db_connection.commit()
+                flash("Your account has been created! Please sign in", 'success')
+                db_connection.close()
+                return redirect("/login")
+            else:
+                flash("Passwords do not match! Please try again.", 'error')
+                return redirect("/signup")
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
+    db_connection = db.connect_to_database()
+
+    if request.method == "POST":
+
+        if request.form.get("User_Login"):
+            user_email = request.form["email"]
+            user_password = request.form["password"]
+
+            login_query = "SELECT * FROM Users WHERE user_email = %s AND user_password = SHA1(%s)"
+
+            cur = db_connection.cursor()
+            cur.execute(login_query, (user_email, user_password))
+
+            account_result = cur.fetchone()
+
+            if account_result:
+                session["logged_in"] = True
+                session["fname"] = account_result[1]
+                session["lname"] = account_result[2]
+                session["email"] = account_result[3]
+                session["password"] = account_result[4]
+                session["is_admin"] = account_result[5]
+                db_connection.close()
+                return render_template("index.html", account = account_result)
+            else:
+                flash("Incorrect username/password! Please try again.", 'error')
+                db_connection.close()
+                return redirect("/login")
+
     return render_template("login.html")
+
+@app.route('/logout')
+def logout():
+    session.pop("logged_in", None)
+    return render_template("index.html")
 
 @app.route("/search-profiles")
 def search():

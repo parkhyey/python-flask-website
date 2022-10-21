@@ -6,15 +6,32 @@
       <div class="row justify-content-center">
         <div>
           <div class="card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% for category, message in messages %}
+                <div class="{{ category }} text-center">{{ message }}</div>
+              {% endfor %}
+            {% endwith %} 
             <h3 class="card-title text-center">CREATE AN ACCOUNT</h3>
             <div class="card-body py-md-4">
-              <form _lpchecked="1">
+              <form id="registerUser" action="/register" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                   <input
                     type="text"
                     class="form-control"
                     id="name"
-                    placeholder="Name"
+                    placeholder="First Name"
+                    name="fname"
+                    required
+                  />
+                </div>
+                <div class="form-group">
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="name"
+                    placeholder="Last Name"
+                    name="lname"
+                    required
                   />
                 </div>
                 <div class="form-group">
@@ -23,15 +40,18 @@
                     class="form-control"
                     id="email"
                     placeholder="Email"
+                    name="email"
+                    required
                   />
                 </div>
-
                 <div class="form-group">
                   <input
                     type="password"
                     class="form-control"
                     id="password"
                     placeholder="Password"
+                    name="password"
+                    required
                   />
                 </div>
                 <div class="form-group">
@@ -39,15 +59,20 @@
                     type="password"
                     class="form-control"
                     id="confirm-password"
-                    placeholder="confirm-password"
+                    placeholder="Confirm Password"
+                    name="confirmation"
+                    required
                   />
                 </div>
-                <div
-                  class="d-flex flex-row align-items-center justify-content-between"
-                >
-                  <button class="btn btn-primary">SUBMIT</button>
-                </div>
-                <div class="login">
+                <div class="form-group">
+                  <label for="type">Role:</label>
+                  <select class="form-select" name="admin" required>
+                    <option value="1">Admin</option>
+                    <option value="0">User</option> 
+                  </select>
+                </div> <br>
+                <div class="d-flex flex-row align-items-center justify-content-center">
+                  <input class="btn btn-primary" type="submit" value="SUBMIT" name="Register_User">
                   <button class="btn btn-login"><a href="/login">SIGN IN</a></button>
                 </div>
               </form>

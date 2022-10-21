@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container">
+    <div class="row justify-content-center">
+      <div>
+        <!-- flash messages -->
+        <div class="card">
+          <h3 class="card-title text-center">MANAGE USER PROFILE</h3>
+          <div class="card-body py-md-4">
+            <div class="row">
+                <div class="col">
+                    <p class="mb-0">First Name:</p>
+                </div>
+                <div class="col">
+                        <p class="text-muted mb-0">{{ session["fname"] }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="mb-0">Last Name:</p>
+                </div>
+                <div class="col">
+                        <p class="text-muted mb-0">{{ session["lname"] }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="mb-0">Email:</p>
+                </div>
+                <div class="col">
+                        <p class="text-muted mb-0">{{ session["email"] }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="mb-0">Password:</p>
+                </div>
+                <div class="col">
+                    <p class="text-muted mb-0">*******</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <p class="mb-0">Status:</p>
+                </div>
+                {% if session["is_admin"] == 1 %}
+                <div class="col">
+                    <p class="text-muted mb-0">Admin</p>
+                </div>
+                {% else %}
+                <div class="col">
+                    <p class="text-muted mb-0">Regular User</p>
+                </div>
+                {% endif %}
+            </div>
+            <br>
+            <div class="d-flex flex-row align-items-center justify-content-center">
+                <input class="btn btn-primary" type="submit" value="EDIT PROFILE" name="Edit_User">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</div>
+{% endblock %}

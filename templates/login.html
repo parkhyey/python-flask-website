@@ -6,15 +6,22 @@
       <div class="row justify-content-center">
         <div>
           <div class="card">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+              {% for category, message in messages %}
+                <div class="{{ category }} text-center">{{ message }}</div>
+              {% endfor %}
+            {% endwith %}
             <h3 class="card-title text-center">EXISTING ACCOUNT: SIGN IN</h3>
             <div class="card-body py-md-4">
-              <form _lpchecked="1">
+              <form id="userLogin" action="/login" method="post" enctype="multipart/form-data">
                 <div class="form-group">
                   <input
                     type="text"
                     class="form-control"
                     id="email"
                     placeholder="email"
+                    name="email"
+                    required
                   />
                 </div>
                 <div class="form-group">
@@ -23,14 +30,12 @@
                     class="form-control"
                     id="password"
                     placeholder="Password"
+                    name="password"
+                    required
                   />
                 </div>
-                <div
-                  class="d-flex flex-row align-items-center justify-content-between"
-                >
-                  <button class="btn btn-primary">SIGN IN</button>
-                </div>
-                <div class="login">
+                <div class="d-flex flex-row align-items-center justify-content-center">
+                  <input class="btn btn-primary" type="submit" value="SIGN IN" name="User_Login">
                   <button class="btn btn-login"><a href="/signup">New Account</a></button>
                 </div>
               </form>
