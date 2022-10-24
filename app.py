@@ -125,7 +125,22 @@ def search():
 
 @app.route("/browse-profiles")
 def browse():
-    return render_template("browse-profiles.html")
+    db_connection = db.connect_to_database()
+    cur = db_connection.cursor()
+    profiles_query = """SELECT Profiles.profile_id, Profiles.profile_name, 
+        Profiles.profile_type, Profiles.profile_breed, 
+        GROUP_CONCAT(Dispositions.disposition_value), 
+        Profiles.profile_availability, Profiles.profile_news, 
+        Profiles.profile_description, Profiles.profile_image 
+        FROM Profiles_Dispositions 
+        JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id 
+        JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id 
+        GROUP BY Profiles.profile_id;"""
+    cursor = db.execute_query(db_connection, profiles_query)
+    profiles = cursor.fetchall()
+
+    db_connection.close()
+    return render_template("browse-profiles.html", items=profiles, len=len(profiles))
 
 @app.route("/daily-news")
 def news():

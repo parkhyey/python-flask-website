@@ -307,4 +307,18 @@ table {
 .btn-profiles {
   padding: 0.5rem;
 }
+
+.carousel-caption {
+    position: relative;
+    left: 0;
+    top: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .carousel-control .icon-prev, .carousel-control .icon-next, .carousel-control .glyphicon-chevron-left, .carousel-control .glyphicon-chevron-right {
+    font-size: 24px;
+    line-height: 24px;
+    margin-top: -12px;
+  }
+}
 /* previous css --- end*/

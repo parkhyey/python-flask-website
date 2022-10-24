@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block main %}
+  <div class="container">
+    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="false">
+      <div class="carousel-inner">
+        {% for i in range(0, len) %}
+          {% if i == 0 %}
+            <div class="carousel-item active">
+          {% else %}
+            <div class="carousel-item">
+          {% endif %}
+              <img src="../static/img/profile/{{ items[i]['profile_image'] }}" class="d-block w-100"/>
+              <div class="carousel-caption">
+                <h5>{{ items[i]['profile_name'] }}</h5>
+                <div>
+                   <div class="list-group">
+                     <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Type</h5>
+                      </div>
+                      <p class="mb-1">{{ items[i]['profile_type'] }}</p>
+                     </a>
+                     <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Breed</h5>
+                      </div>
+                      <p class="mb-1">{{ items[i]['profile_breed'] }}</p>
+                     </a>
+                     <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Disposition</h5>
+                      </div>
+                      <p class="mb-1">{{ items[i]['GROUP_CONCAT(Dispositions.disposition_value)'] }}</p>
+                     </a>
+                     <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Availability</h5>
+                      </div>
+                      <p class="mb-1">{{ items[i]['profile_availability'] }}</p>
+                     </a>
+                     <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Description</h5>
+                      </div>
+                      <p class="mb-1">{{ items[i]['profile_description'] }}</p>
+                     </a>
+                     <a href="#" class="list-group-item list-group-item-action">
+                      <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">News</h5>
+                      </div>
+                      <p class="mb-1">{{ items[i]['profile_news'] }}</p>
+                     </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+        {% endfor %}
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </div>
+{% endblock %}
