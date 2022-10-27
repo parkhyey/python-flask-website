@@ -12,18 +12,19 @@ CREATE TABLE Profiles(
 	profile_availability VARCHAR(255) NOT NULL,
 	profile_news VARCHAR(255) NOT NULL,
 	profile_description VARCHAR(255) NOT NULL,
-	profile_image VARCHAR(255) NOT NULL
+	profile_image VARCHAR(255) NOT NULL,
+    profile_created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE = InnoDB;
 
-INSERT INTO Profiles(profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image) 
+INSERT INTO Profiles(profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image, profile_created_at) 
 VALUES 
-    ("Layla", "Cat", "Siamese", "Available", "She just arrived at the shelter!", "Small size, long tail, white with brown paws", "siamese.jpg"),
-    ("March", "Dog", "Golden Retriever", "Available", "Newly Available for adoption!","Large size, light golden fur", "golden.jpg"),
-    ("Ram", "Other", "N/A", "Available", "He likes to sleep", "Small size, white goat", "goat.jpg"),
-	("Luna", "Cat", "Persian", "Pending", "Just adopted!", "Small size, long tail, orange with black spots", "persian.jpg"),
-	("Hammie", "Other", "Hamster", "Available", "He likes to stash food", "Small size, long haired, brown fur", "hamster.jpg"),
-	("Buster", "Dog", "German Shepherd", "Not available", "Just adopted!", "Big size, tan fur", "gsd.jpg"),
-	("Benji", "Dog", "Pomeranian", "Available", "Still available for adoption! He's a sweetheart", "Small size, black and white fur", "pom.jpg")
+    ("Layla", "Cat", "Siamese", "Available", "She just arrived at the shelter!", "Small size, long tail, white with brown paws", "siamese.jpg", "2022-10-26 13:23:44"),
+    ("March", "Dog", "Golden Retriever", "Available", "Newly Available for adoption!","Large size, light golden fur", "golden.jpg", "2022-10-24 13:23:44"),
+    ("Ram", "Other", "Goat", "Available", "He likes to sleep", "Small size, white goat", "goat.jpg", "2022-10-11 13:23:44"),
+	("Luna", "Cat", "Persian", "Pending", "Just adopted!", "Small size, long tail, orange with black spots", "persian.jpg", "2022-03-11 13:23:44"),
+	("Hammie", "Other", "Hamster", "Available", "He likes to stash food", "Small size, long haired, brown fur", "hamster.jpg", "2021-09-11 13:23:44"),
+	("Buster", "Dog", "German Shepherd", "Not available", "Just adopted!", "Big size, tan fur", "gsd.jpg", "2022-10-22 13:23:44"),
+	("Benji", "Dog", "Pomeranian", "Available", "Still available for adoption! He's a sweetheart", "Small size, black and white fur", "pom.jpg", "2021-11-11 13:23:44")
 ;
 
 CREATE TABLE Dispositions (
@@ -111,6 +112,7 @@ VALUES
     ("Other", "Rabbit"),
     ("Other", "Turtle"),
     ("Other", "Guinea Pig"),
+    ("Other", "Goat"),
     ("Other", "Ferret"),
     ("Other", "Parrot"),
     ("Other", "Other")
