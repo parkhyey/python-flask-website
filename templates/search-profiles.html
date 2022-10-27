@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<div class="container">
+  <div class="row justify-content-center">
+    <div class="card-profiles">
+      <h3 class="card-title text-center">SEARCH PROFILES</h3>
+      <div class="right-align"><button class="btn-profiles"><a href="/browse-profiles">BROWSE PROFILES</a></button></div>
+      <div class="card-body py-md-4">
+        <!-- search form -->
+        <form id="search-form" method='post' autocomplete="off">
+          <fieldset>
+            <div class="form-group">
+              <label for="type">Type:</label>
+              <select class="form-select" name="type" id="type">
+                <option value="Cat"
+                  {% if data["profile"] is defined and data["profile"][2] == "Cat" %}
+                      selected="true"
+                  {% endif %}>Cat</option>
+                <option value="Dog"
+                  {% if data["profile"] is defined and data["profile"][2] == "Dog" %}
+                      selected="true"
+                  {% endif %}>Dog</option>
+                <option value="Other"
+                  {% if data["profile"] is defined and data["profile"][2] == "Other" %}
+                      selected="true"
+                  {% endif %}>Other</option>
+              </select>
+            </div><br>
+            <div class="form-group">
+              <label for="breed">Breed:</label>
+              <select class="form-select" name="breed" id="breed">
+              </select>
+            </div><br>
+            <div class="form-group">
+              <label for="disposition">Disposition:</label>
+              <select class="form-select" name="disposition" id="disposition">
+                <option value="Any">Any</option>
+                {% for dispo in data["disp"] %}
+                <option value="{{ dispo.disposition_value }}">{{ dispo.disposition_value }}</option>
+                {% endfor %}
+              </select>
+            </div><br>
+            <div class="form-group">
+              <label for="created">Date Created:</label>
+              <select class="form-select" name="created" id="created">
+                <option value="Any">Any</option>
+                <option value="Past 24 hours">Past 24 hours</option>
+                <option value="Past Week">Past Week</option>
+                <option value="Past Month">Past Month</option>
+                <option value="Past Year">Past Year</option>
+              </select>
+            </div><br>
+            <input type="submit" id='search' value='Search'>
+          </fieldset>
+        </form>
+      </div>
+      <!-- flash messages -->
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% for category, message in messages %}
+          <div class="{{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endwith %}
+      <!-- Table -->
+      <div id="inner-container">
+        <table id="results-table">
+          <thead>
+            <tr>
+              <th>Profile ID</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th>Breed</th>
+              <th>Disposition</th>
+              <th>Availability</th>
+              <th>Description</th>
+              <th>Image</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in data["search"] %}
+            <tr>
+              <td>{{ item['profile_id'] }}</td>
+              <td>{{ item['profile_name'] }}</td>
+              <td>{{ item['profile_type'] }}</td>
+              <td>{{ item['profile_breed'] }}</td>
+              <td>{{ item['disp'] }}</td>
+              <td>{{ item['profile_availability'] }}</td>
+              <td>{{ item['profile_description'] }}</td>
+              <td><a href="../static/img/profile/{{ item['profile_image'] }}"><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></a></td>
+              <td><button class="btn-profiles"
+                onclick="window.location='/profiles/{{ item['profile_id'] }}'">Request a Date!</button></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{%  endblock %}
+{% block js %}
+  <script>
+  $(window).on('load', function() {
+
+      let items = {{ data['animals'] | tojson }};
+
+      {% if data['profile'] is defined %}
+        let profile = {{ data['profile'] | tojson }};
+      {% endif %}
+
+      $el = $('#breed');
+      $el.empty();
+      $.each(items, function (index, item) {
+          if (item[1] === $("#type").val()) {
+              $el.append($("<option></option>")
+                  .attr("value", item[2]).text(item[2]));
+          }
+      });
+
+      if(typeof profile !== "undefined")
+          $el.val(profile[3]);
+
+      $("#type").change(function () {
+          $el = $('#breed');
+          $el.empty();
+          $.each(items, function (index, item) {
+              if (item[1] === $("#type").val()) {
+                  $el.append($("<option></option>")
+                      .attr("value", item[2]).text(item[2]));
+              }
+          });
+      });
+
+  });
+  </script>
+  <script>
+    // stop form resubmission on page refresh
+    if ( window.history.replaceState ) {
+      window.history.replaceState( null, null, window.location.href );
+    }
+  </script>
+  <script>
+    if ($('#results-table > tbody > tr').length == 0){
+     $('#results-table > thead > tr').css('display','none');
+ }</script>
+{% endblock %}
