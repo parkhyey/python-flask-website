@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import os
 import database.db_connector as db
 import datetime
+from dateutil.relativedelta import relativedelta
 
 # Define Upload folder
 UPLOAD_FOLDER = "static/img/profile"
@@ -119,9 +120,90 @@ def logout():
     session.pop("logged_in", None)
     return render_template("index.html")
 
-@app.route("/search-profiles")
+@app.route("/search-profiles", methods=["GET", "POST"])
 def search():
-    return render_template("search-profiles.html")
+    db_connection = db.connect_to_database()
+    cur = db_connection.cursor()
+
+    disp_qry = "SELECT disposition_value FROM Dispositions"
+    cur.execute(disp_qry)
+    disp_results = cur.fetchall()
+
+    animal_qry = "SELECT * FROM Animals"
+    cur.execute(animal_qry)
+    animals_results = cur.fetchall()
+
+    disp_qry = "SELECT * FROM Dispositions"
+    disp_cursor = db.execute_query(db_connection=db_connection, query=disp_qry)
+    disp = disp_cursor.fetchall()
+
+    profiles_qry = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+        FROM Profiles p \
+        JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
+        JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+        GROUP BY p.profile_id;"
+    profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_qry)
+    profiles_results = profiles_cursor.fetchall()
+
+    # display all results before search
+    search_results = profiles_results
+
+    # search from Profiles table
+    if request.method == "POST":
+        profile_type = request.form.get('type')
+        profile_breed = request.form.get('breed')
+        disposition_value = request.form.get('disposition')
+        profile_created_at = request.form.get('created')
+        start_date = '1900-01-01 00:00:00'
+        current_date = datetime.datetime.today()
+        if profile_created_at == "Past 24 hours":
+            start_date = current_date - relativedelta(hours=24) 
+        elif profile_created_at == "Past Week":
+            start_date = current_date - relativedelta(days=7) 
+        elif profile_created_at == "Past Month":
+            start_date = current_date - relativedelta(months=1)
+        elif profile_created_at == "Past Year":
+            start_date = current_date - relativedelta(years=1)
+        # print(profile_created_at, "/ current_date=", current_date, "/ start_date=", start_date)
+
+        if disposition_value == "Any":
+            search_qry = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+                FROM Profiles p \
+                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
+                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+                WHERE profile_type = %s AND profile_breed = %s \
+                    AND profile_created_at BETWEEN %s AND %s \
+                ORDER BY p.profile_id ASC;"
+            data_params = (profile_type, profile_breed, start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
+
+        else:
+            search_qry_disp = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+                FROM Profiles p \
+                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
+                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+                WHERE profile_type = %s AND profile_breed = %s AND d.disposition_value LIKE %s \
+                    AND profile_created_at BETWEEN %s AND %s \
+                 ORDER BY p.profile_id ASC;"
+            data_params_disp = (profile_type, profile_breed, disposition_value, start_date, current_date)        
+            search_cursor_disp = db.execute_query(db_connection=db_connection, query=search_qry_disp, query_params=data_params_disp)
+            search_results = search_cursor_disp.fetchall()
+        
+        # if no search result, display error message
+        if len(search_results) == 0 or search_results[0].get("profile_id") == None: 
+            flash("No Results Found.", 'error')
+            search_results = ""
+
+    data = {
+        "profile": profiles_results,
+        "dispositions": disp_results,
+        "animals": animals_results,
+        "search" : search_results,
+        "disp" : disp
+    }
+    db_connection.close()    
+    return render_template("search-profiles.html", data=data)
 
 @app.route("/browse-profiles")
 def browse():
