@@ -192,7 +192,10 @@ def search():
         
         # if no search result, display error message
         if len(search_results) == 0 or search_results[0].get("profile_id") == None: 
-            flash("No Results Found.", 'error')
+            if profile_breed is None:
+                flash("Please select a breed.", 'error')
+            else:
+                flash("No Results Found.", 'error')
             search_results = ""
 
     data = {
