@@ -3,6 +3,7 @@ DROP TABLE IF EXISTS Dispositions;
 DROP TABLE IF EXISTS Profiles;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Animals;
+DROP TABLE IF EXISTS Animals_Search;
 
 CREATE TABLE Profiles(
     profile_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -108,6 +109,48 @@ VALUES
     ("Cat", "Sphynx"),
     ("Cat", "Himalayan"),
     ("Cat", "Other"),
+    ("Other", "Hamster"),
+    ("Other", "Rabbit"),
+    ("Other", "Turtle"),
+    ("Other", "Guinea Pig"),
+    ("Other", "Goat"),
+    ("Other", "Ferret"),
+    ("Other", "Parrot"),
+    ("Other", "Other");
+
+CREATE TABLE Animals_Search (
+	animal_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    animal_category VARCHAR(255) NOT NULL,
+    animal_breed VARCHAR(255) NOT NULL
+) ENGINE = InnoDB;
+
+INSERT INTO Animals_Search(animal_category, animal_breed)
+VALUES
+	("Dog", "Any"),
+	("Dog", "Labrador Retriever"),
+    ("Dog", "German Shepherd"),
+    ("Dog", "Golden Retriever"),
+    ("Dog", "French Bulldog"),
+    ("Dog", "Bulldog"),
+    ("Dog", "Beagle"),
+    ("Dog", "Poodle"),
+    ("Dog", "Rottweiler"),
+    ("Dog", "Yorkshire Terrier"),
+    ("Dog", "German Shorthaired Pointer"),
+    ("Dog", "Other"),
+	("Cat", "Any"),
+    ("Cat", "Siamese"),
+    ("Cat", "Persian"),
+    ("Cat", "Maine Coon"),
+    ("Cat", "Ragdoll"),
+    ("Cat", "Bengal"),
+    ("Cat", "Abyssinian"),
+    ("Cat", "Birman"),
+    ("Cat", "American Shorthair"),
+    ("Cat", "Sphynx"),
+    ("Cat", "Himalayan"),
+    ("Cat", "Other"),
+    ("Other", "Any"),
     ("Other", "Hamster"),
     ("Other", "Rabbit"),
     ("Other", "Turtle"),

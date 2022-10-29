@@ -51,7 +51,7 @@
                 <option value="Past Year">Past Year</option>
               </select>
             </div><br>
-            <input type="submit" id='search' value='Search'>
+            <button class="btn-profiles" type="submit" id='search' value='Search'>Search</button>
           </fieldset>
         </form>
       </div>
@@ -117,6 +117,10 @@
                   .attr("value", item[2]).text(item[2]));
           }
       });
+
+      $(el).ready(()=>{
+            $("#select").val("Any");
+        }); 
 
       if(typeof profile !== "undefined")
           $el.val(profile[3]);

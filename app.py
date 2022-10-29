@@ -129,7 +129,7 @@ def search():
     cur.execute(disp_qry)
     disp_results = cur.fetchall()
 
-    animal_qry = "SELECT * FROM Animals"
+    animal_qry = "SELECT * FROM Animals_Search"
     cur.execute(animal_qry)
     animals_results = cur.fetchall()
 
@@ -141,7 +141,8 @@ def search():
         FROM Profiles p \
         JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
         JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
-        GROUP BY p.profile_id;"
+        GROUP BY p.profile_id \
+        ORDER BY p.profile_id ASC;"
     profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_qry)
     profiles_results = profiles_cursor.fetchall()
 
@@ -165,37 +166,60 @@ def search():
         elif profile_created_at == "Past Year":
             start_date = current_date - relativedelta(years=1)
         # print(profile_created_at, "/ current_date=", current_date, "/ start_date=", start_date)
+        if profile_breed == "Any" and disposition_value == "Any":
+            search_qry_any = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+                FROM Profiles p \
+                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
+                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+                WHERE profile_type = %s AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY p.profile_id \
+                ORDER BY p.profile_id ASC;"
+            data_params_any = (profile_type, start_date, current_date)        
+            search_cursor_any = db.execute_query(db_connection=db_connection, query=search_qry_any, query_params=data_params_any)
+            search_results = search_cursor_any.fetchall()
 
-        if disposition_value == "Any":
-            search_qry = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+        elif profile_breed == "Any" and disposition_value != "Any":
+            search_qry_disp = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+                FROM Profiles p \
+                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
+                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+                WHERE profile_type = %s AND d.disposition_value LIKE %s \
+                    AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY p.profile_id \
+                ORDER BY p.profile_id ASC;"
+            data_params_disp = (profile_type, disposition_value, start_date, current_date)        
+            search_cursor_disp = db.execute_query(db_connection=db_connection, query=search_qry_disp, query_params=data_params_disp)
+            search_results = search_cursor_disp.fetchall()
+
+        elif profile_breed != "Any" and disposition_value == "Any":
+            search_qry_breed = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
                 FROM Profiles p \
                 JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
                 JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
                 WHERE profile_type = %s AND profile_breed = %s \
                     AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY p.profile_id \
                 ORDER BY p.profile_id ASC;"
-            data_params = (profile_type, profile_breed, start_date, current_date)        
-            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
-            search_results = search_cursor.fetchall()
+            data_params_breed = (profile_type, profile_breed, start_date, current_date)        
+            search_cursor_breed = db.execute_query(db_connection=db_connection, query=search_qry_breed, query_params=data_params_breed)
+            search_results = search_cursor_breed.fetchall()
 
         else:
-            search_qry_disp = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+            search_qry_else = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
                 FROM Profiles p \
                 JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
                 JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
                 WHERE profile_type = %s AND profile_breed = %s AND d.disposition_value LIKE %s \
                     AND profile_created_at BETWEEN %s AND %s \
-                 ORDER BY p.profile_id ASC;"
-            data_params_disp = (profile_type, profile_breed, disposition_value, start_date, current_date)        
-            search_cursor_disp = db.execute_query(db_connection=db_connection, query=search_qry_disp, query_params=data_params_disp)
-            search_results = search_cursor_disp.fetchall()
+                GROUP BY p.profile_id \
+                ORDER BY p.profile_id ASC;"
+            data_params_else = (profile_type, profile_breed, disposition_value, start_date, current_date)        
+            search_cursor_else = db.execute_query(db_connection=db_connection, query=search_qry_else, query_params=data_params_else)
+            search_results = search_cursor_else.fetchall()
         
         # if no search result, display error message
         if len(search_results) == 0 or search_results[0].get("profile_id") == None: 
-            if profile_breed is None:
-                flash("Please select a breed.", 'error')
-            else:
-                flash("No Results Found.", 'error')
+            flash("No Results Found.", 'error')
             search_results = ""
 
     data = {
