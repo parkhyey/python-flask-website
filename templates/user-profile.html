@@ -5,62 +5,135 @@
     <div class="row justify-content-center">
       <div>
         <!-- flash messages -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% for category, message in messages %}
+            <div class="{{ category }} text-center">{{ message }}</div>
+          {% endfor %}
+        {% endwith %} 
         <div class="card">
           <h3 class="card-title text-center">MANAGE USER PROFILE</h3>
+          {% if data %}
           <div class="card-body py-md-4">
             <div class="row">
                 <div class="col">
                     <p class="mb-0">First Name:</p>
-                </div>
+                </div>  
                 <div class="col">
-                        <p class="text-muted mb-0">{{ session["fname"] }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <p class="mb-0">Last Name:</p>
-                </div>
-                <div class="col">
-                        <p class="text-muted mb-0">{{ session["lname"] }}</p>
+                  <p class="text-muted mb-0">{{ data[1] }}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <p class="mb-0">Email:</p>
+                  <p class="mb-0">Last Name:</p>
                 </div>
                 <div class="col">
-                        <p class="text-muted mb-0">{{ session["email"] }}</p>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col">
-                    <p class="mb-0">Password:</p>
-                </div>
-                <div class="col">
-                    <p class="text-muted mb-0">*******</p>
+                  <p class="text-muted mb-0">{{ data[2] }}</p>
                 </div>
             </div>
             <div class="row">
                 <div class="col">
-                    <p class="mb-0">Status:</p>
+                  <p class="mb-0">Email:</p>
+                </div>
+                <div class="col">
+                  <p class="text-muted mb-0">{{ data[3] }}</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                  <p class="mb-0">Password:</p>
+                </div>
+                <div class="col">
+                  <p class="text-muted mb-0">*******</p>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                  <p class="mb-0">Status:</p>
                 </div>
                 {% if session["is_admin"] == 1 %}
                 <div class="col">
-                    <p class="text-muted mb-0">Admin</p>
+                  <p class="text-muted mb-0">Admin</p>
                 </div>
                 {% else %}
                 <div class="col">
-                    <p class="text-muted mb-0">Regular User</p>
+                  <p class="text-muted mb-0">Regular User</p>
                 </div>
                 {% endif %}
             </div>
+            {% endif %}
             <br>
             <div class="d-flex flex-row align-items-center justify-content-center">
-                <input class="btn btn-primary" type="submit" value="EDIT PROFILE" name="Edit_User">
-            </div>
+								<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit User Info</button>
+							</div>
           </div>
         </div>
       </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="exampleModalLabel">Edit User Profile</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {% if data %}
+      <div class="modal-body">
+        <form id="editUser" action="/edit-user/{{ session['id'] }}" method="post">
+          <div class="form-group">
+            <label for="recipient-name" class="control-label">First Name:</label>
+            <input type="text" class="form-control" id="fname" name="fname" value="{{ data[1] }}" required>
+          </div>
+          <div class="form-group">
+            <label for="message-text" class="control-label">Last Name:</label>
+            <input type="text" class="form-control" id="lname" name="lname" value="{{ data[2] }}" required>
+          </div>
+					<div class="form-group">
+            <label for="message-text" class="control-label">User Email:</label>
+            <input type="text" class="form-control" id="email" name="email" value="{{ data[3] }}" required>
+          </div>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault" name="toggleSwitch">
+            <label class="form-check-label" for="flexSwitchCheckDefault">Change Password</label>
+          </div>
+          <div id="changePassword">
+            <div class="form-group">
+              <label for="message-text" class="control-label">Password:</label>
+              <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="form-group">
+              <label for="message-text" class="control-label">Confirm Password:</label>
+              <input type="password" class="form-control" id="confirmPassword" name="confirmation" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+            <input type="submit" value="SAVE CHANGES" class="btn btn-primary" name="Edit_User">
+          </div>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block js %}
+<script>
+  var passwordBlock = $('#changePassword');
+      switchToggle = $('#flexSwitchCheckDefault');
+
+  passwordBlock.hide();
+
+  switchToggle.on('click', function() {
+    if($(this).is(':checked')) {
+      passwordBlock.show();
+      passwordBlock.find('input').attr('required', true);
+    } else{
+      passwordBlock.hide();
+      passwordBlock.find('input').attr('required', false);
+    }
+  })
+</script>
 {% endblock %}

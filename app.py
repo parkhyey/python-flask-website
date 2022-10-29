@@ -40,8 +40,16 @@ def signup():
 
 @app.route("/user-profile")
 def user_profile():
+    db_connection = db.connect_to_database()
+    id = session["id"]
+    # query to grab the info and display on modal
+    modal_query = "SELECT * FROM Users WHERE user_id = %s"
 
-    return render_template("user-profile.html")
+    cur = db_connection.cursor()
+    cur.execute(modal_query, (id,))
+    data = cur.fetchone()
+
+    return render_template("user-profile.html", data=data)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
@@ -101,6 +109,7 @@ def login():
 
             if account_result:
                 session["logged_in"] = True
+                session["id"] = account_result[0]
                 session["fname"] = account_result[1]
                 session["lname"] = account_result[2]
                 session["email"] = account_result[3]
@@ -114,6 +123,45 @@ def login():
                 return redirect("/login")
 
     return render_template("login.html")
+
+
+@app.route("/edit-user/<int:id>", methods=["GET", "POST"])
+def edit_user(id):
+
+    if request.method == "POST":
+        db_connection = db.connect_to_database()
+
+        # Grab user form inputs
+        fname = request.form["fname"]
+        lname = request.form["lname"]
+        email = request.form["email"]
+
+        # User toggles switch to 'Change Password'
+        if request.form.get('toggleSwitch'):
+
+            password = request.form["password"]
+            password_confirmation = request.form["confirmation"]
+
+            # Error handling for password and confirmation password
+            if(password == password_confirmation):
+                update_user_query = "UPDATE Users SET user_fname = %s, user_lname = %s, user_email = %s, user_password = SHA1(%s) WHERE user_id = %s;"
+                cur = db_connection.cursor()
+                cur.execute(update_user_query, (fname, lname, email, password, id))
+                db_connection.commit()
+                db_connection.close()
+                flash("Profile updated!", 'success')
+                return redirect("/user-profile")
+            else:
+                flash("Passwords do not match! Please try again.", 'error')
+                return redirect("/user-profile")
+        else:
+            update_user_query = "UPDATE Users SET user_fname = %s, user_lname = %s, user_email = %s WHERE user_id = %s;"
+            cur = db_connection.cursor()
+            cur.execute(update_user_query, (fname, lname, email, id))
+            db_connection.commit()
+            db_connection.close()
+            flash("Profile updated!", 'success')
+            return redirect("/user-profile")
 
 @app.route('/logout')
 def logout():
