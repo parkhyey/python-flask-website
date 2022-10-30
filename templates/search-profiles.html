@@ -13,6 +13,7 @@
             <div class="form-group">
               <label for="type">Type:</label>
               <select class="form-select" name="type" id="type">
+                <option value="Any">Any</option>
                 <option value="Cat"
                   {% if data["profile"] is defined and data["profile"][2] == "Cat" %}
                       selected="true"
@@ -117,10 +118,12 @@
       $el = $('#breed');
       $el.empty();
       $.each(items, function (index, item) {
-          if (item[1] === $("#type").val()) {
-              $el.append($("<option></option>")
-                  .attr("value", item[2]).text(item[2]));
-              $('select').val("Any");
+          if (item[1] != "Any") {
+              if (item[1] === $("#type").val()) {
+                  $el.append($("<option></option>")
+                      .attr("value", item[2]).text(item[2]));
+                  $('select').val("Any");
+            }
           }
       });
 

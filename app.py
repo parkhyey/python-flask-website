@@ -214,7 +214,23 @@ def search():
         elif profile_created_at == "Past Year":
             start_date = current_date - relativedelta(years=1)
         # print(profile_created_at, "/ current_date=", current_date, "/ start_date=", start_date)
-        if profile_breed == "Any" and disposition_value == "Any":
+
+        if profile_type == "Any" and disposition_value == "Any":
+            search_results = profiles_results
+
+        elif profile_type == "Any" and disposition_value != "Any":
+            search_qry_ = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+                FROM Profiles p \
+                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
+                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+                WHERE d.disposition_value LIKE %s AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY p.profile_id \
+                ORDER BY p.profile_id ASC;"
+            data_params_ = (disposition_value, start_date, current_date)        
+            search_cursor_ = db.execute_query(db_connection=db_connection, query=search_qry_, query_params=data_params_)
+            search_results = search_cursor_.fetchall()
+
+        elif profile_breed == "Any" and disposition_value == "Any":
             search_qry_any = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
                 FROM Profiles p \
                 JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
