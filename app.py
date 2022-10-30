@@ -185,24 +185,36 @@ def search():
     disp_cursor = db.execute_query(db_connection=db_connection, query=disp_qry)
     disp = disp_cursor.fetchall()
 
-    profiles_qry = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+    drop_temp_qry = "DROP TABLE IF EXISTS Temp;"
+    drop_temp_cursor = db.execute_query(db_connection=db_connection, query=drop_temp_qry)
+    drop_temp_results = drop_temp_cursor.fetchall()
+
+    create_temp_qry = "CREATE TABLE Temp AS SELECT p.profile_id as profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
         FROM Profiles p \
         JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
         JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
         GROUP BY p.profile_id \
         ORDER BY p.profile_id ASC;"
-    profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_qry)
-    profiles_results = profiles_cursor.fetchall()
+    create_temp_cursor = db.execute_query(db_connection=db_connection, query=create_temp_qry)
+    create_temp_results = create_temp_cursor.fetchall()
+
+    select_qry = "SELECT * FROM Temp;"
+    select_cursor = db.execute_query(db_connection=db_connection, query=select_qry)
+    select_results = select_cursor.fetchall()
 
     # display all results before search
-    search_results = profiles_results
+    search_results = select_results
 
-    # search from Profiles table
+    # search data when form is submitted
     if request.method == "POST":
         profile_type = request.form.get('type')
         profile_breed = request.form.get('breed')
         disposition_value = request.form.get('disposition')
+        if disposition_value != "Any":
+            disposition_value = "%"+ request.form.get('disposition') + "%"
         profile_created_at = request.form.get('created')
+
+        # set dates per search option
         start_date = '1900-01-01 00:00:00'
         current_date = datetime.datetime.today()
         if profile_created_at == "Past 24 hours":
@@ -216,70 +228,58 @@ def search():
         # print(profile_created_at, "/ current_date=", current_date, "/ start_date=", start_date)
 
         if profile_type == "Any" and disposition_value == "Any":
-            search_results = profiles_results
+            search_qry = "SELECT * from Temp \
+                WHERE profile_created_at BETWEEN %s AND %s \
+                GROUP BY profile_id \
+                ORDER BY profile_id ASC;"
+            data_params = (start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
 
         elif profile_type == "Any" and disposition_value != "Any":
-            search_qry_ = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
-                FROM Profiles p \
-                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
-                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
-                WHERE d.disposition_value LIKE %s AND profile_created_at BETWEEN %s AND %s \
-                GROUP BY p.profile_id \
-                ORDER BY p.profile_id ASC;"
-            data_params_ = (disposition_value, start_date, current_date)        
-            search_cursor_ = db.execute_query(db_connection=db_connection, query=search_qry_, query_params=data_params_)
-            search_results = search_cursor_.fetchall()
+            search_qry = "SELECT * from Temp \
+                WHERE disp LIKE %s AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY profile_id \
+                ORDER BY profile_id ASC;"
+            data_params = (disposition_value, start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
 
-        elif profile_breed == "Any" and disposition_value == "Any":
-            search_qry_any = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
-                FROM Profiles p \
-                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
-                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
+        elif profile_type!= "Any" and profile_breed == "Any" and disposition_value == "Any":
+            search_qry = "SELECT * from Temp \
                 WHERE profile_type = %s AND profile_created_at BETWEEN %s AND %s \
-                GROUP BY p.profile_id \
-                ORDER BY p.profile_id ASC;"
-            data_params_any = (profile_type, start_date, current_date)        
-            search_cursor_any = db.execute_query(db_connection=db_connection, query=search_qry_any, query_params=data_params_any)
-            search_results = search_cursor_any.fetchall()
+                GROUP BY profile_id \
+                ORDER BY profile_id ASC;"
+            data_params = (profile_type, start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
 
-        elif profile_breed == "Any" and disposition_value != "Any":
-            search_qry_disp = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
-                FROM Profiles p \
-                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
-                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
-                WHERE profile_type = %s AND d.disposition_value LIKE %s \
-                    AND profile_created_at BETWEEN %s AND %s \
-                GROUP BY p.profile_id \
-                ORDER BY p.profile_id ASC;"
-            data_params_disp = (profile_type, disposition_value, start_date, current_date)        
-            search_cursor_disp = db.execute_query(db_connection=db_connection, query=search_qry_disp, query_params=data_params_disp)
-            search_results = search_cursor_disp.fetchall()
+        elif profile_type!= "Any" and profile_breed == "Any" and disposition_value != "Any":
+            search_qry = "SELECT * from Temp \
+                WHERE profile_type = %s AND disp LIKE %s AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY profile_id \
+                ORDER BY profile_id ASC;"
+            data_params = (profile_type, disposition_value, start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
 
-        elif profile_breed != "Any" and disposition_value == "Any":
-            search_qry_breed = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
-                FROM Profiles p \
-                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
-                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
-                WHERE profile_type = %s AND profile_breed = %s \
-                    AND profile_created_at BETWEEN %s AND %s \
-                GROUP BY p.profile_id \
-                ORDER BY p.profile_id ASC;"
-            data_params_breed = (profile_type, profile_breed, start_date, current_date)        
-            search_cursor_breed = db.execute_query(db_connection=db_connection, query=search_qry_breed, query_params=data_params_breed)
-            search_results = search_cursor_breed.fetchall()
+        elif profile_type!= "Any" and profile_breed != "Any" and disposition_value == "Any":
+            search_qry = "SELECT * from Temp \
+                WHERE profile_type = %s AND profile_breed = %s AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY profile_id \
+                ORDER BY profile_id ASC;"
+            data_params = (profile_type, profile_breed, start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
 
         else:
-            search_qry_else = "SELECT p.profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
-                FROM Profiles p \
-                JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
-                JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
-                WHERE profile_type = %s AND profile_breed = %s AND d.disposition_value LIKE %s \
-                    AND profile_created_at BETWEEN %s AND %s \
-                GROUP BY p.profile_id \
-                ORDER BY p.profile_id ASC;"
-            data_params_else = (profile_type, profile_breed, disposition_value, start_date, current_date)        
-            search_cursor_else = db.execute_query(db_connection=db_connection, query=search_qry_else, query_params=data_params_else)
-            search_results = search_cursor_else.fetchall()
+            search_qry = "SELECT * from Temp \
+                WHERE profile_type = %s AND profile_breed = %s AND disp LIKE %s AND profile_created_at BETWEEN %s AND %s \
+                GROUP BY profile_id \
+                ORDER BY profile_id ASC;"
+            data_params = (profile_type, profile_breed, disposition_value, start_date, current_date)        
+            search_cursor = db.execute_query(db_connection=db_connection, query=search_qry, query_params=data_params)
+            search_results = search_cursor.fetchall()
         
         # if no search result, display error message
         if len(search_results) == 0 or search_results[0].get("profile_id") == None: 
@@ -287,7 +287,7 @@ def search():
             search_results = ""
 
     data = {
-        "profile": profiles_results,
+        "profile": select_results,
         "dispositions": disp_results,
         "animals": animals_results,
         "search" : search_results,
