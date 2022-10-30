@@ -104,7 +104,12 @@
   $(window).on('load', function() {
 
       let items = {{ data['animals'] | tojson }};
-
+      items.unshift(
+        [0, 'Cat', 'Any'],
+        [0, 'Dog', 'Any'],
+        [0, 'Other', 'Any'],
+      );
+      console.log(items);
       {% if data['profile'] is defined %}
         let profile = {{ data['profile'] | tojson }};
       {% endif %}
@@ -115,12 +120,9 @@
           if (item[1] === $("#type").val()) {
               $el.append($("<option></option>")
                   .attr("value", item[2]).text(item[2]));
+              $('select').val("Any");
           }
       });
-
-      // $(el).ready(()=>{
-      //       $("#select").val("Any");
-      //   }); 
 
       if(typeof profile !== "undefined")
           $el.val(profile[3]);

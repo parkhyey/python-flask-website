@@ -177,7 +177,7 @@ def search():
     cur.execute(disp_qry)
     disp_results = cur.fetchall()
 
-    animal_qry = "SELECT * FROM Animals_Search"
+    animal_qry = "SELECT * FROM Animals"
     cur.execute(animal_qry)
     animals_results = cur.fetchall()
 
