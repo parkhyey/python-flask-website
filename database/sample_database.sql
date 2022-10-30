@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS Dispositions;
 DROP TABLE IF EXISTS Profiles;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Animals;
-DROP TABLE IF EXISTS Animals_Search;
+DROP TABLE IF EXISTS Temp;
 
 CREATE TABLE Profiles(
     profile_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -94,6 +94,7 @@ VALUES
     ("Dog", "Bulldog"),
     ("Dog", "Beagle"),
     ("Dog", "Poodle"),
+    ("Dog", "Pomeranian"),
     ("Dog", "Rottweiler"),
     ("Dog", "Yorkshire Terrier"),
     ("Dog", "German Shorthaired Pointer"),
