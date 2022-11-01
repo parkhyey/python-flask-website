@@ -22,13 +22,22 @@ app.secret_key = "secret"
 # Home
 @app.route("/")
 def root():
+    db_connection = db.connect_to_database()
+    cur = db_connection.cursor()
+    news_query= """SELECT n.*, p.profile_image
+        FROM News n
+        JOIN Profiles p ON n.profile_id = p.profile_id
+        ORDER BY news_date DESC"""
+    cursor = db.execute_query(db_connection, news_query)
+    animal_news = cursor.fetchall()
+    db_connection.close()
     """Render index.html as home page"""
-    return render_template("index.html")
+    return render_template("index.html", stories=animal_news)
 
 @app.route("/index")
 def index():
     """Render index.html as home page"""
-    return render_template("index.html")
+    return redirect(url_for('root'))
 
 @app.route("/index-user")
 def index_user():
@@ -367,8 +376,10 @@ def delete_profiles(id):
         # get image file name
         profile_img = select_results[0].get('profile_image')
         delete_profiles_disposition_query = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s;"
+        delete_news_query = "DELETE FROM News WHERE profile_id = %s"
         delete_profiles_query = "DELETE FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
         delete_profiles_disposition_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_disposition_query, query_params=data)
+        delete_news_cursor = db.execute_query(db_connection, delete_news_query, data)
         delete_profiles_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_query, query_params=data)
         # flash success messages
         flash("You have deleted profile id #" + str(id) + ".")
@@ -418,6 +429,11 @@ def profile():
             profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image) VALUES (%s, %s, %s, %s, %s, %s, %s); SET @profile_id = LAST_INSERT_ID()"
             cur = db_connection.cursor()
             cur.execute(profiles_query, (_profile["name"], _profile["type"], _profile["breed"], _profile["availability"], _profile["news"], _profile["description"], filename))
+
+            # Insert into News table
+            news_query = "INSERT INTO News (profile_id, news_description) VALUES (@profile_id, %s);"
+            cur = db_connection.cursor()
+            cur.execute(news_query, (_profile['news'],))
 
             # Insert into Profiles_Dispositions table
             disposition_query = "INSERT INTO Profiles_Dispositions (profile_id, disposition_id) VALUES (@profile_id, %s);"
@@ -495,6 +511,7 @@ def profile_id(id):
             cur.execute(curr_profile_qry, (int(id),))
             curr_profile = cur.fetchone()
             curr_img = curr_profile[7]
+            curr_news = curr_profile[5]
 
             filename = "";
             if len(_profile["picture"].filename) > 0:
@@ -509,6 +526,13 @@ def profile_id(id):
                         os.remove(os.path.join(UPLOAD_FOLDER, curr_img))
             else:
                 filename = curr_img
+
+            # News - only add to News table if news has changed
+            if _profile["news"] != curr_news:
+                news_query = "INSERT INTO News (profile_id, news_description) VALUES (%s, %s);"
+                cur = db_connection.cursor()
+                cur.execute(news_query, (int(id), _profile['news']))
+
 
             # delete dispositions and resave them to update
             disp_delete_qry = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s"

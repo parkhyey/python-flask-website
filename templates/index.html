@@ -59,5 +59,32 @@
         </div>
       </div>
       <!-- /admin-section -->
+
+      <!-- news-section -->
+      <div class="section">
+        <div class="container">
+          <div class="row justify-content-center">
+            <div class="col-12 text-center">
+              <h2 class="section-title">News</h2>
+            </div>
+            <ul class="list-group">
+              {% for story in stories %}
+                <li class="list-group-item hstack">
+                  <div class="col-3">
+                    <img src="../static/img/profile/{{ story['profile_image'] }}" class="img-fluid"/>
+                  </div>
+                  <div class="col">
+                    <div class="p-5 vstack">
+                      <h5>{{ story['news_date'] }}</h5>
+                      <p>{{ story['news_description'] }}</p>
+                    </div>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- /news-section -->
     </div>
     {%  endblock %}

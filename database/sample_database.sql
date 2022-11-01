@@ -1,5 +1,6 @@
 DROP TABLE IF EXISTS Profiles_Dispositions;
 DROP TABLE IF EXISTS Dispositions;
+DROP TABLE IF EXISTS News;
 DROP TABLE IF EXISTS Profiles;
 DROP TABLE IF EXISTS Users;
 DROP TABLE IF EXISTS Animals;
@@ -119,3 +120,21 @@ VALUES
     ("Other", "Ferret"),
     ("Other", "Parrot"),
     ("Other", "Other");
+
+CREATE TABLE News (
+	news_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    profile_id INT NOT NULL,
+    news_description VARCHAR(255) NOT NULL,
+    news_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES Profiles(profile_id)
+) ENGINE = InnoDB;
+
+INSERT INTO News(profile_id, news_description, news_date)
+VALUES
+	(1, "She just arrived at the shelter!", "2022-10-26 13:23:44"),
+    (2, "Newly Available for adoption!", "2022-10-24 13:23:44"),
+    (3, "He likes to sleep", "2022-10-11 13:23:44"),
+    (4, "Just adopted!", "2022-03-11 13:23:44"),
+    (5, "He likes to stash food", "2021-09-11 13:23:44"),
+    (6, "Just adopted!", "2022-10-22 13:23:44"),
+    (7, "Still available for adoption! He's a sweetheart", "2021-11-11 13:23:44")
