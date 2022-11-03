@@ -125,6 +125,7 @@
       switchToggle = $('#flexSwitchCheckDefault');
 
   passwordBlock.hide();
+  passwordBlock.find('input').attr('required', false);
 
   switchToggle.on('click', function() {
     if($(this).is(':checked')) {
