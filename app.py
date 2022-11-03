@@ -441,6 +441,13 @@ def delete_profiles(id):
         # flash error messages
         flash("To delete a profile, the profile availability must be 'Not available'.", 'error')
     else:
+        check_query = "SELECT * FROM Date_Requests WHERE profile_id = %s;"
+        check_cursor = db.execute_query(db_connection=db_connection, query=check_query, query_params=data)
+        check_results = check_cursor.fetchall()
+        if len(check_results) > 0:
+            delete_date_query = "DELETE FROM Date_Requests WHERE profile_id = %s"
+            delete_date_cursor = db.execute_query(db_connection=db_connection, query=delete_date_query, query_params=data)
+            delete_date_results = delete_date_cursor.fetchall()            
         # get image file name
         profile_img = select_results[0].get('profile_image')
         delete_profiles_disposition_query = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s;"
