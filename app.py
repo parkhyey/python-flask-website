@@ -22,12 +22,12 @@ app.permanent_session_lifetime = datetime.timedelta(days=365)
 app.secret_key = "secret"  
 
 # Email Configuration (testing server)
-app.config['MAIL_SERVER'] ='smtp.mailtrap.io'
-app.config['MAIL_PORT'] = 2525
-app.config['MAIL_USERNAME'] = '4b11d9302b18d1'
-app.config['MAIL_PASSWORD'] = 'fea843ac55df2f'
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_SERVER']='smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = 'fureverfriendfinder1@gmail.com'
+app.config['MAIL_PASSWORD'] = 'tfeuljljvwrxttxi'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 mail = Mail(app)
 SENDER = 'admin@fureverfriendfinder.com'
 
@@ -543,7 +543,7 @@ def send_email_thread(message):
 
 def notification_send():
     db_connection = db.connect_to_database()
-    select_user_qry = "SELECT user_email FROM Users;"
+    select_user_qry = "SELECT DISTINCT user_email FROM Users;"
     cur = db_connection.cursor()
     cur.execute(select_user_qry)
     users = cur.fetchall()
