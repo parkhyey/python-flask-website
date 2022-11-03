@@ -332,3 +332,7 @@ table {
 .form-select {
   border: solid 1pt rgb(168, 168, 168);
 }
+
+.admin-section {
+  display: none
+}

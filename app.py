@@ -138,7 +138,7 @@ def login():
                 session["password"] = account_result[4]
                 session["is_admin"] = account_result[5]
                 db_connection.close()
-                return render_template("index.html", account = account_result)
+                return redirect("/")
             else:
                 flash("Incorrect username/password! Please try again.", 'error')
                 db_connection.close()
@@ -188,7 +188,8 @@ def edit_user(id):
 @app.route('/logout')
 def logout():
     session.pop("logged_in", None)
-    return render_template("index.html")
+    session.clear()
+    return redirect("/")
 
 @app.route("/search-profiles", methods=["GET", "POST"])
 def search():

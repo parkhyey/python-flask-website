@@ -40,7 +40,7 @@
       <!-- /main-section -->
 
       <!-- admin-section -->
-      <div class="admin-section">
+      <div class="admin-section" id="adminSection">
         <div class="container">
           <a href="/create-profiles"><button class="btn btn-admin">CREATE PROFILES</button></a>
           <a href="/manage-profiles"><button class="btn btn-admin">MANAGE PROFILES</button></a>
@@ -76,3 +76,16 @@
       <!-- /news-section -->
     </div>
     {%  endblock %}
+{% block js %}
+<script>
+  var adminBlock = $('#adminSection');
+
+  $(window).on('load', function() {
+    if({{ session['is_admin'] }} == 1){
+      adminBlock.show();
+    } else{
+      adminBlock.hide();
+    }
+  })
+</script>
+{% endblock %}
