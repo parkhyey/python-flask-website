@@ -4,6 +4,9 @@ import os
 import database.db_connector as db
 import datetime
 from dateutil.relativedelta import relativedelta
+from flask_mail import Mail, Message
+import smtplib
+from threading import Thread
 
 # Define Upload folder
 UPLOAD_FOLDER = "static/img/profile"
@@ -17,6 +20,16 @@ app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 app.secret_key = "secret"  
+
+# Email Configuration (testing server)
+app.config['MAIL_SERVER'] ='smtp.mailtrap.io'
+app.config['MAIL_PORT'] = 2525
+app.config['MAIL_USERNAME'] = '4b11d9302b18d1'
+app.config['MAIL_PASSWORD'] = 'fea843ac55df2f'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+mail = Mail(app)
+SENDER = 'admin@fureverfriendfinder.com'
 
 # Routes
 # Home
@@ -305,6 +318,61 @@ def search():
     db_connection.close()    
     return render_template("search-profiles.html", data=data)
 
+@app.route("/check-session/<page>/<int:id>", methods=["GET", "POST"])
+def check_session(page, id):
+    """Check if user session exists"""
+    if session.get('logged_in') == True:
+        user_email = session.get('email')
+        return redirect(url_for("date_request", page=page, id = id, user_email = user_email))
+    else:
+        return redirect(url_for("login"))
+
+@app.route("/date-request/<page>/<int:id>/<user_email>", methods=["GET"])
+def date_request(page, id, user_email):
+    """Get a date request, update profile availbility, add Date_Requests data and send confirmation email to user"""
+    db_connection = db.connect_to_database()
+    if request.method == "GET":
+        available = "Available"
+        pending = "Pending"
+        
+        # verify profile_availability
+        select_qry = "SELECT * FROM Profiles \
+            WHERE profile_id = %s AND profile_availability = %s;"
+        data_params = (id, available)
+        select_cursor = db.execute_query(db_connection=db_connection, query=select_qry, query_params=data_params)
+        select_results = select_cursor.fetchall()   
+
+        # update profile_availability
+        request_qry = "UPDATE Profiles \
+            SET profile_availability = %s \
+            WHERE profile_id = %s;"
+        data_params_req = (pending, id)
+        request_cursor = db.execute_query(db_connection=db_connection, query=request_qry, query_params=data_params_req)
+        request_results = request_cursor.fetchall()
+
+        # add Date_Requests data
+        insert_qry = "INSERT INTO Date_Requests (profile_id, user_email) VALUES (%s, %s);"
+        data_params_insert = (id, user_email)
+        insert_cursor = db.execute_query(db_connection=db_connection, query=insert_qry, query_params=data_params_insert)
+        insert_results = request_cursor.fetchall()
+
+    if len(select_results) == 0:
+        flash("To request a date, the animal profile must be available.", 'error')
+
+    elif len(select_results) > 0:
+        flash("You have successfully requested a date! Check your email for confirmation.", 'success')
+        if user_email:
+            message = Message(
+                sender = SENDER, 
+                subject="Your Date Request Confirmation",
+                recipients=[user_email],
+                html = render_template('email/date-notification.html'),
+                )
+            mail.send(message)
+
+    db_connection.close()    
+    return redirect(url_for(page))
+
 @app.route("/browse-profiles")
 def browse():
     db_connection = db.connect_to_database()
@@ -382,7 +450,7 @@ def delete_profiles(id):
         delete_news_cursor = db.execute_query(db_connection, delete_news_query, data)
         delete_profiles_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_query, query_params=data)
         # flash success messages
-        flash("You have deleted profile id #" + str(id) + ".")
+        flash("You have deleted profile id #" + str(id) + ".", 'success')
 
     # delete the select image file if exists
     if profile_img and os.path.exists(UPLOAD_FOLDER+"/"+profile_img):
@@ -453,10 +521,36 @@ def profile():
             else: 
                 db_connection.commit()
                 # Success message
-                flash("Your profile has been created!", 'success')
+                if _profile["availability"] == "Available":
+                    # Send notification email
+                    notification_send()
+                    flash("Your profile has been created! A notification email has been sent to all users.", 'success')
+                else:
+                    flash("Your profile has been created!", 'success')
                 db_connection.close()
                 return redirect("/manage-profiles")
 
+def send_email_thread(message):
+    with app.app_context():
+        mail.send(message)
+
+def notification_send():
+    db_connection = db.connect_to_database()
+    select_user_qry = "SELECT user_email FROM Users;"
+    cur = db_connection.cursor()
+    cur.execute(select_user_qry)
+    users = cur.fetchall()
+    with app.app_context():
+        for i in range(len(users)):
+            message = Message(
+                sender = SENDER, 
+                subject="Meet our new furry friends!",
+                recipients=[users[i][0]],
+                html = render_template('email/new-notification.html')
+                )
+            print("email(", i, ")=", users[i][0])
+            Thread(target=send_email_thread, args=[message]).start()
+    db_connection.close()
 
 @app.route('/profiles/<int:id>', methods=["GET", "PUT"])
 def profile_id(id):

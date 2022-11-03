@@ -158,7 +158,6 @@ a:focus {
   text-align: right;
 }
 
-/* previous css --- start*/
 #header {
   text-align: center;
   font-size: 65px;
@@ -308,6 +307,14 @@ table {
   padding: 0.5rem;
 }
 
+.btn-request {
+  padding: 0.5rem;
+}
+
+.btn-request:hover {
+  background-color: rgb(148, 215, 241);  
+}
+
 .carousel-caption {
     position: relative;
     left: 0;
@@ -321,4 +328,7 @@ table {
     margin-top: -12px;
   }
 }
-/* previous css --- end*/
+
+.form-select {
+  border: solid 1pt rgb(168, 168, 168);
+}

@@ -89,8 +89,8 @@
               <td>{{ item['profile_availability'] }}</td>
               <td>{{ item['profile_description'] }}</td>
               <td><a href="../static/img/profile/{{ item['profile_image'] }}"><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></a></td>
-              <td><button class="btn-profiles"
-                onclick="window.location='/profiles/{{ item['profile_id'] }}'">Request a Date!</button></td>
+              <td><button class="btn-request"
+                onclick="window.location='/check-session/{{ 'search' }}/{{ item['profile_id'] }}'">Request a Date!</button></td>
             </tr>
             {% endfor %}
           </tbody>

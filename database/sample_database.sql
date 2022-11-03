@@ -1,3 +1,4 @@
+DROP TABLE IF EXISTS Date_Requests;
 DROP TABLE IF EXISTS Profiles_Dispositions;
 DROP TABLE IF EXISTS Dispositions;
 DROP TABLE IF EXISTS News;
@@ -137,4 +138,12 @@ VALUES
     (4, "Just adopted!", "2022-03-11 13:23:44"),
     (5, "He likes to stash food", "2021-09-11 13:23:44"),
     (6, "Just adopted!", "2022-10-22 13:23:44"),
-    (7, "Still available for adoption! He's a sweetheart", "2021-11-11 13:23:44")
+    (7, "Still available for adoption! He's a sweetheart", "2021-11-11 13:23:44");
+
+CREATE TABLE Date_Requests (
+	date_id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    profile_id INT NOT NULL,
+	user_email VARCHAR(255) NOT NULL,
+    request_created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (profile_id) REFERENCES Profiles(profile_id)
+) ENGINE = InnoDB;

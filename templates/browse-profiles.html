@@ -51,6 +51,9 @@
                       </div>
                       <p class="mb-1">{{ items[i]['profile_news'] }}</p>
                      </a>
+                     <br>
+                     <button class="btn-request"
+                      onclick="window.location='/check-session/{{ 'browse' }}/{{ items[i]['profile_id'] }}'">Request a Date!</button>
                   </div>
                 </div>
               </div>
@@ -66,5 +69,12 @@
         <span class="visually-hidden">Next</span>
       </button>
     </div>
+    <!-- flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+    <br>
   </div>
 {% endblock %}
