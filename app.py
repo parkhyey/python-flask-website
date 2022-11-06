@@ -548,13 +548,21 @@ def notification_send():
     cur = db_connection.cursor()
     cur.execute(select_user_qry)
     users = cur.fetchall()
+
+    new_profile_qry = "SELECT profile_name, profile_type, profile_breed, profile_description, profile_image FROM Profiles ORDER BY profile_id DESC LIMIT 1;"
+    cur = db_connection.cursor()
+    cur.execute(new_profile_qry)
+    new_profile = cur.fetchone()
+    print("new_profile", new_profile)
+    html = render_template('email/new-notification.html', item = new_profile)
+
     with app.app_context():
         for i in range(len(users)):
             message = Message(
                 sender = SENDER, 
                 subject="Meet our new furry friends!",
                 recipients=[users[i][0]],
-                html = render_template('email/new-notification.html')
+                html = html
                 )
             print("email(", i, ")=", users[i][0])
             Thread(target=send_email_thread, args=[message]).start()
