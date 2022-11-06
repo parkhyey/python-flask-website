@@ -16,7 +16,7 @@ SAMPLE_IMAGES = ['goat.jpg', 'golden.jpg', 'gsd.jpg', 'hamster.jpg', 'persian.jp
 
 # Configuration
 app = Flask(__name__)
-app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER")
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 app.secret_key = "secret"  
 
