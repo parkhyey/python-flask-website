@@ -9,7 +9,6 @@ import smtplib
 from threading import Thread
 
 # Define Upload folder
-UPLOAD_FOLDER = "static/img/profile"
 ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
 
 # Sample images
