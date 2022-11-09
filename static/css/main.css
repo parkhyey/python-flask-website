@@ -221,12 +221,21 @@ a:focus {
   z-index: 1;
 }
 
-.card {
-  border: 0.40em solid #f8f9fa;
-  padding: 1rem;
-  margin: 3% 30% 0;
-  width: 40%;
-  min-width: 25rem;
+@media(max-width: 599px) {
+  .card {
+    border: 0.40em solid #f8f9fa;
+    padding: 1rem;
+  }
+}
+
+@media(min-width: 600px) {
+  .card {
+    border: 0.40em solid #f8f9fa;
+    padding: 1rem;
+    margin: 3% 30% 0;
+    width: 40%;
+    min-width: 25rem;
+  }
 }
 
 .form-control {

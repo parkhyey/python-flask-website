@@ -64,37 +64,39 @@
       {% endwith %}
       <!-- Table -->
       <div id="inner-container">
-        <table id="results-table">
-          <thead>
-            <tr>
-              <th>Profile ID</th>
-              <th>Name</th>
-              <th>Type</th>
-              <th>Breed</th>
-              <th>Disposition</th>
-              <th>Availability</th>
-              <th>Description</th>
-              <th>Image</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for item in data["search"] %}
-            <tr>
-              <td>{{ item['profile_id'] }}</td>
-              <td>{{ item['profile_name'] }}</td>
-              <td>{{ item['profile_type'] }}</td>
-              <td>{{ item['profile_breed'] }}</td>
-              <td>{{ item['disp'] }}</td>
-              <td>{{ item['profile_availability'] }}</td>
-              <td>{{ item['profile_description'] }}</td>
-              <td><a href="../static/img/profile/{{ item['profile_image'] }}"><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></a></td>
-              <td><button class="btn-request"
-                onclick="window.location='/check-session/{{ 'search' }}/{{ item['profile_id'] }}'">Request a Date!</button></td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
+        <div class="table-responsive">
+          <table id="results-table">
+            <thead>
+              <tr>
+                <th>Profile ID</th>
+                <th>Name</th>
+                <th>Type</th>
+                <th>Breed</th>
+                <th>Disposition</th>
+                <th>Availability</th>
+                <th>Description</th>
+                <th>Image</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in data["search"] %}
+              <tr>
+                <td>{{ item['profile_id'] }}</td>
+                <td>{{ item['profile_name'] }}</td>
+                <td>{{ item['profile_type'] }}</td>
+                <td>{{ item['profile_breed'] }}</td>
+                <td>{{ item['disp'] }}</td>
+                <td>{{ item['profile_availability'] }}</td>
+                <td>{{ item['profile_description'] }}</td>
+                <td><a href="../static/img/profile/{{ item['profile_image'] }}"><img src="../static/img/profile/{{ item['profile_image'] }}" class="img-fluid w-100 d-block"></a></td>
+                <td><button class="btn-request"
+                  onclick="window.location='/check-session/{{ 'search' }}/{{ item['profile_id'] }}'">Request a Date!</button></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
