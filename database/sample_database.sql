@@ -178,6 +178,3 @@ VALUES
     (7, "pom.jpg"),
     (7, "pom2.jpg"),
     (7, "pom3.jpg");
-
-
-

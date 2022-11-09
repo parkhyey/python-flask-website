@@ -10,6 +10,7 @@ from threading import Thread
 from werkzeug.utils import secure_filename
 
 # Define Upload folder
+# UPLOAD_FOLDER = "static/img/profile"
 ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
 
 def allowed_file(filename):
@@ -20,6 +21,7 @@ SAMPLE_IMAGES = ['goat.jpg', 'golden.jpg', 'gsd.jpg', 'hamster.jpg', 'persian.jp
 
 # Configuration
 app = Flask(__name__)
+# app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER")
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 app.secret_key = "secret"  
@@ -485,10 +487,10 @@ def delete_profiles(id):
 
     # delete the select image file if exists
     for img in profile_img_arr:
-        if img and os.path.exists(UPLOAD_FOLDER+"/"+img):
+        if img and os.path.exists(app.config["UPLOAD_FOLDER"]+"/"+img):
         # ignore the sample images
             if not img in SAMPLE_IMAGES:
-                os.remove(UPLOAD_FOLDER+"/"+img)
+                os.remove(app.config["UPLOAD_FOLDER"]+"/"+img)
 
     db_connection.close()
     return redirect(url_for('manage'))
