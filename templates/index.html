@@ -58,9 +58,31 @@
             <ul class="list-group">
               {% for story in stories %}
                 <li class="list-group-item hstack">
-                  <div class="col-3">
-                    <img src="../static/img/profile/{{ story['profile_image'] }}" class="img-fluid"/>
+
+                  <!-- Carousel -->
+                  <div id="hello{{ story['news_id'] }}" class="carousel slide" data-bs-ride="true" style="width: 640px; height:360px;">
+                    <div class="carousel-indicators">
+                      <button type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                      <button type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                      <button type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                    </div>
+                    <div class="carousel-inner">
+                      {% for image in (story['combined_images']).split(',') %}
+                      <div class="carousel-item active">
+                        <img src="../static/img/profile/{{ image }}" class="img-fluid">
+                      </div>
+                      {% endfor %}
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide="prev">
+                      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide="next">
+                      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                      <span class="visually-hidden">Next</span>
+                    </button>
                   </div>
+
                   <div class="col">
                     <div class="p-5 vstack">
                       <h5>{{ story['news_date'] }}</h5>

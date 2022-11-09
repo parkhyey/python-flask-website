@@ -336,3 +336,11 @@ table {
 .admin-section {
   display: none
 }
+
+#slide {
+  width: auto;
+  height: 750px;
+  overflow-x: auto;
+  overflow-y: auto;
+  white-space: nowrap;
+}
