@@ -7,15 +7,21 @@ from dateutil.relativedelta import relativedelta
 from flask_mail import Mail, Message
 import smtplib
 from threading import Thread
+from werkzeug.utils import secure_filename
 
 # Define Upload folder
+# UPLOAD_FOLDER = "static/img/profile"
 ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 # Sample images
 SAMPLE_IMAGES = ['goat.jpg', 'golden.jpg', 'gsd.jpg', 'hamster.jpg', 'persian.jpg', 'pom.jpg', 'poodle.jpg', 'siamese.jpg']
 
 # Configuration
 app = Flask(__name__)
+# app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER")
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 app.secret_key = "secret"  
@@ -36,8 +42,11 @@ SENDER = 'admin@fureverfriendfinder.com'
 def root():
     db_connection = db.connect_to_database()
     cur = db_connection.cursor()
-    news_query= """SELECT n.*, p.profile_image
-        FROM News n
+    news_query= """SELECT n.*,
+        (SELECT GROUP_CONCAT(i.image_path)
+			FROM Profile_Images i
+            WHERE i.profile_id = n.profile_id) AS combined_images
+		FROM News n
         JOIN Profiles p ON n.profile_id = p.profile_id
         ORDER BY news_date DESC"""
     cursor = db.execute_query(db_connection, news_query)
@@ -85,7 +94,9 @@ def register():
             user_password = request.form["password"]
             user_password_confirmation = request.form["confirmation"]
             user_is_admin = request.form["admin"]
-
+            user_email_preference = 1
+            if request.form.get("email-preference") == None:
+                user_email_preference = 0
             # Select Users table for account verifcation
             users_select_query = "SELECT * FROM Users WHERE user_email = %s"
 
@@ -99,9 +110,9 @@ def register():
                 return redirect("/signup")
             elif user_password_confirmation == user_password:
                 # Insert into Users table
-                users_insert_query = "INSERT INTO Users (user_fname, user_lname, user_email, user_password, user_is_admin) VALUES (%s, %s, %s, SHA1(%s), %s);"
+                users_insert_query = "INSERT INTO Users (user_fname, user_lname, user_email, user_password, user_is_admin, user_email_preference) VALUES (%s, %s, %s, SHA1(%s), %s, %s);"
 
-                cur.execute(users_insert_query, (user_fname, user_lname, user_email, user_password, user_is_admin))
+                cur.execute(users_insert_query, (user_fname, user_lname, user_email, user_password, user_is_admin, user_email_preference))
 
                 db_connection.commit()
                 flash("Your account has been created! Please sign in", 'success')
@@ -211,7 +222,7 @@ def search():
     drop_temp_cursor = db.execute_query(db_connection=db_connection, query=drop_temp_qry)
     drop_temp_results = drop_temp_cursor.fetchall()
 
-    create_temp_qry = "CREATE TABLE Temp AS SELECT p.profile_id as profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_image, profile_created_at \
+    create_temp_qry = "CREATE TABLE Temp AS SELECT p.profile_id as profile_id, profile_name, profile_type, profile_breed, GROUP_CONCAT(d.disposition_value) AS disp, profile_availability, profile_description, profile_created_at \
         FROM Profiles p \
         JOIN Profiles_Dispositions pd ON p.profile_id = pd.profile_id \
         JOIN Dispositions d ON pd.disposition_id = d.disposition_id \
@@ -220,7 +231,7 @@ def search():
     create_temp_cursor = db.execute_query(db_connection=db_connection, query=create_temp_qry)
     create_temp_results = create_temp_cursor.fetchall()
 
-    select_qry = "SELECT * FROM Temp;"
+    select_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image FROM Temp;"
     select_cursor = db.execute_query(db_connection=db_connection, query=select_qry)
     select_results = select_cursor.fetchall()
 
@@ -250,7 +261,7 @@ def search():
         # print(profile_created_at, "/ current_date=", current_date, "/ start_date=", start_date)
 
         if profile_type == "Any" and disposition_value == "Any":
-            search_qry = "SELECT * from Temp \
+            search_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image from Temp \
                 WHERE profile_created_at BETWEEN %s AND %s \
                 GROUP BY profile_id \
                 ORDER BY profile_id ASC;"
@@ -259,7 +270,7 @@ def search():
             search_results = search_cursor.fetchall()
 
         elif profile_type == "Any" and disposition_value != "Any":
-            search_qry = "SELECT * from Temp \
+            search_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image from Temp \
                 WHERE disp LIKE %s AND profile_created_at BETWEEN %s AND %s \
                 GROUP BY profile_id \
                 ORDER BY profile_id ASC;"
@@ -268,7 +279,7 @@ def search():
             search_results = search_cursor.fetchall()
 
         elif profile_type!= "Any" and profile_breed == "Any" and disposition_value == "Any":
-            search_qry = "SELECT * from Temp \
+            search_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image from Temp \
                 WHERE profile_type = %s AND profile_created_at BETWEEN %s AND %s \
                 GROUP BY profile_id \
                 ORDER BY profile_id ASC;"
@@ -277,7 +288,7 @@ def search():
             search_results = search_cursor.fetchall()
 
         elif profile_type!= "Any" and profile_breed == "Any" and disposition_value != "Any":
-            search_qry = "SELECT * from Temp \
+            search_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image from Temp \
                 WHERE profile_type = %s AND disp LIKE %s AND profile_created_at BETWEEN %s AND %s \
                 GROUP BY profile_id \
                 ORDER BY profile_id ASC;"
@@ -286,7 +297,7 @@ def search():
             search_results = search_cursor.fetchall()
 
         elif profile_type!= "Any" and profile_breed != "Any" and disposition_value == "Any":
-            search_qry = "SELECT * from Temp \
+            search_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image from Temp \
                 WHERE profile_type = %s AND profile_breed = %s AND profile_created_at BETWEEN %s AND %s \
                 GROUP BY profile_id \
                 ORDER BY profile_id ASC;"
@@ -295,7 +306,7 @@ def search():
             search_results = search_cursor.fetchall()
 
         else:
-            search_qry = "SELECT * from Temp \
+            search_qry = "SELECT *, (SELECT i.image_path FROM Profile_Images i WHERE i.profile_id = Temp.profile_id LIMIT 1) AS profile_image FROM Temp \
                 WHERE profile_type = %s AND profile_breed = %s AND disp LIKE %s AND profile_created_at BETWEEN %s AND %s \
                 GROUP BY profile_id \
                 ORDER BY profile_id ASC;"
@@ -354,19 +365,28 @@ def date_request(page, id, user_email):
         insert_qry = "INSERT INTO Date_Requests (profile_id, user_email) VALUES (%s, %s);"
         data_params_insert = (id, user_email)
         insert_cursor = db.execute_query(db_connection=db_connection, query=insert_qry, query_params=data_params_insert)
-        insert_results = request_cursor.fetchall()
+        insert_results = insert_cursor.fetchall()
 
     if len(select_results) == 0:
         flash("To request a date, the animal profile must be available.", 'error')
 
     elif len(select_results) > 0:
         flash("You have successfully requested a date! Check your email for confirmation.", 'success')
+        profile_qry = """SELECT profile_name, profile_type, profile_breed, profile_description, 
+                            (SELECT i.image_path
+			                FROM Profile_Images i
+                            WHERE i.profile_id = Profiles.profile_id LIMIT 1) AS profile_image
+                            FROM Profiles 
+                            WHERE profile_id = %s;"""
+        cur = db_connection.cursor()
+        cur.execute(profile_qry, (id,))
+        profile = cur.fetchone()
         if user_email:
             message = Message(
                 sender = SENDER, 
                 subject="Your Date Request Confirmation",
                 recipients=[user_email],
-                html = render_template('email/date-notification.html'),
+                html = render_template('email/date-notification.html', item = profile),
                 )
             mail.send(message)
 
@@ -377,11 +397,15 @@ def date_request(page, id, user_email):
 def browse():
     db_connection = db.connect_to_database()
     cur = db_connection.cursor()
+
     profiles_query = """SELECT Profiles.profile_id, Profiles.profile_name, 
         Profiles.profile_type, Profiles.profile_breed, 
         GROUP_CONCAT(Dispositions.disposition_value), 
         Profiles.profile_availability, Profiles.profile_news, 
-        Profiles.profile_description, Profiles.profile_image 
+        Profiles.profile_description,
+            (SELECT GROUP_CONCAT(i.image_path)
+			FROM Profile_Images i
+            WHERE i.profile_id = Profiles.profile_id) AS combined_images
         FROM Profiles_Dispositions 
         JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id 
         JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id 
@@ -420,7 +444,14 @@ def create():
 @app.route("/manage-profiles", methods=["GET"])
 def manage():
     db_connection = db.connect_to_database()
-    profiles_query = "SELECT Profiles.profile_id, Profiles.profile_name, Profiles.profile_type, Profiles.profile_breed, GROUP_CONCAT(Dispositions.disposition_value), Profiles.profile_availability, Profiles.profile_news, Profiles.profile_description, Profiles.profile_image FROM Profiles_Dispositions JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id GROUP BY Profiles.profile_id;"
+    profiles_query = """SELECT Profiles.profile_id, Profiles.profile_name, Profiles.profile_type, Profiles.profile_breed, GROUP_CONCAT(Dispositions.disposition_value), Profiles.profile_availability, Profiles.profile_news, Profiles.profile_description, 
+                            (SELECT i.image_path
+			                FROM Profile_Images i
+                            WHERE i.profile_id = Profiles.profile_id LIMIT 1) AS profile_image
+                        FROM Profiles_Dispositions 
+                        JOIN Profiles ON Profiles_Dispositions.profile_id = Profiles.profile_id 
+                        JOIN Dispositions ON Profiles_Dispositions.disposition_id = Dispositions.disposition_id 
+                        GROUP BY Profiles.profile_id;"""
     profiles_cursor = db.execute_query(db_connection=db_connection, query=profiles_query)
     profiles_results = profiles_cursor.fetchall()
 
@@ -432,7 +463,7 @@ def delete_profiles(id):
     """Delete an animal profile from the Profiles table"""
     db_connection = db.connect_to_database()
     data = (id,)
-    select_query = "SELECT * FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
+    select_query = "SELECT *, (SELECT GROUP_CONCAT(i.image_path) FROM Profile_Images i WHERE i.profile_id = Profiles.profile_id) AS profile_image FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
     select_cursor = db.execute_query(db_connection=db_connection, query=select_query, query_params=data)
     select_results = select_cursor.fetchall()
     profile_img = ""
@@ -450,20 +481,27 @@ def delete_profiles(id):
             delete_date_results = delete_date_cursor.fetchall()            
         # get image file name
         profile_img = select_results[0].get('profile_image')
+        delete_profiles_image_query = "DELETE FROM Profile_Images WHERE profile_id = %s"
         delete_profiles_disposition_query = "DELETE FROM Profiles_Dispositions WHERE profile_id = %s;"
         delete_news_query = "DELETE FROM News WHERE profile_id = %s"
         delete_profiles_query = "DELETE FROM Profiles WHERE profile_id = %s AND profile_availability = 'Not available';"
         delete_profiles_disposition_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_disposition_query, query_params=data)
+        delete_profiles_image_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_image_query, query_params=data)
         delete_news_cursor = db.execute_query(db_connection, delete_news_query, data)
         delete_profiles_cursor = db.execute_query(db_connection=db_connection, query=delete_profiles_query, query_params=data)
         # flash success messages
         flash("You have deleted profile id #" + str(id) + ".", 'success')
 
+    # Split profile_img string into array
+    profile_img_arr = profile_img.split(',')
+    # print(profile_img_arr)
+
     # delete the select image file if exists
-    if profile_img and os.path.exists(UPLOAD_FOLDER+"/"+profile_img):
+    for img in profile_img_arr:
+        if img and os.path.exists(app.config["UPLOAD_FOLDER"]+"/"+img):
         # ignore the sample images
-        if not profile_img in SAMPLE_IMAGES:
-            os.remove(UPLOAD_FOLDER+"/"+profile_img)
+            if not img in SAMPLE_IMAGES:
+                os.remove(app.config["UPLOAD_FOLDER"]+"/"+img)
 
     db_connection.close()
     return redirect(url_for('manage'))
@@ -494,16 +532,25 @@ def profile():
     if request.method == "POST":
 
         if request.form.get("Add_Profile"):
+
             _profile = get_profile_form_values(request)
 
-            # Save uploaded picture
-            filename = _profile["picture"].filename
-            _profile["picture"].save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-
             # Insert into Profiles table
-            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description, profile_image) VALUES (%s, %s, %s, %s, %s, %s, %s); SET @profile_id = LAST_INSERT_ID()"
+            profiles_query = "INSERT INTO Profiles (profile_name, profile_type, profile_breed, profile_availability, profile_news, profile_description) VALUES (%s, %s, %s, %s, %s, %s); SET @profile_id = LAST_INSERT_ID()"
             cur = db_connection.cursor()
-            cur.execute(profiles_query, (_profile["name"], _profile["type"], _profile["breed"], _profile["availability"], _profile["news"], _profile["description"], filename))
+            cur.execute(profiles_query, (_profile["name"], _profile["type"], _profile["breed"], _profile["availability"], _profile["news"], _profile["description"]))
+
+            # Save multiple pictures and insert into Profile_Images table
+            files = request.files.getlist("pictures[]")
+
+            for file in files:
+                if file and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                    picture_query = "INSERT INTO Profile_Images (profile_id, image_path) VALUES (@profile_id, %s)"
+                    cur = db_connection.cursor()
+                    cur.execute(picture_query, (filename,))
+            cur.close()
 
             # Insert into News table
             news_query = "INSERT INTO News (profile_id, news_description) VALUES (@profile_id, %s);"
@@ -548,23 +595,35 @@ def notification_send():
     cur.execute(select_user_qry)
     users = cur.fetchall()
 
-    new_profile_qry = "SELECT profile_name, profile_type, profile_breed, profile_description, profile_image FROM Profiles ORDER BY profile_id DESC LIMIT 1;"
+    new_profile_qry = """SELECT profile_name, profile_type, profile_breed, profile_description, 
+                            (SELECT i.image_path
+			                FROM Profile_Images i
+                            WHERE i.profile_id = Profiles.profile_id LIMIT 1) AS profile_image
+                            FROM Profiles ORDER BY 
+                            profile_id DESC LIMIT 1;"""
     cur = db_connection.cursor()
     cur.execute(new_profile_qry)
     new_profile = cur.fetchone()
-    print("new_profile", new_profile)
     html = render_template('email/new-notification.html', item = new_profile)
 
     with app.app_context():
         for i in range(len(users)):
-            message = Message(
-                sender = SENDER, 
-                subject="Meet our new furry friends!",
-                recipients=[users[i][0]],
-                html = html
-                )
-            print("email(", i, ")=", users[i][0])
-            Thread(target=send_email_thread, args=[message]).start()
+            user_email = users[i][0]
+            preference_qry = "SELECT user_email_preference FROM Users \
+                WHERE user_email = %s;"
+            data = (user_email,)
+            preference_cursor = db.execute_query(db_connection=db_connection, query=preference_qry, query_params=data)
+            preference_results = preference_cursor.fetchall()
+
+            # check user email preference
+            if preference_results[0]['user_email_preference'] == 1:
+                message = Message(
+                    sender = SENDER, 
+                    subject="Meet our new furry friends!",
+                    recipients=[user_email],
+                    html = html
+                    )
+                Thread(target=send_email_thread, args=[message]).start()
     db_connection.close()
 
 @app.route('/profiles/<int:id>', methods=["GET", "PUT"])
@@ -593,11 +652,16 @@ def profile_id(id):
         cur.execute(animal_qry)
         animals = cur.fetchall()
 
+        image_qry = "SELECT image_path FROM Profile_Images WHERE profile_id = %s"
+        cur.execute(image_qry, (int(id),))
+        images = cur.fetchall()
+
         data = {
             "profile": curr_profile,
             "profile_dispositions": profile_disp,
             "dispositions": disp,
-            "animals": animals
+            "animals": animals,
+            "images": images
         }
         db_connection.close()
         return render_template("create-profiles.html", data=data)
@@ -619,22 +683,12 @@ def profile_id(id):
             curr_profile_qry = "SELECT * FROM Profiles WHERE profile_id = %s"
             cur.execute(curr_profile_qry, (int(id),))
             curr_profile = cur.fetchone()
-            curr_img = curr_profile[7]
             curr_news = curr_profile[5]
 
-            filename = "";
-            if len(_profile["picture"].filename) > 0:
-                filename = _profile["picture"].filename
-                # if picture is being changed
-                if curr_img != filename:
-                    # save the new image
-                    _profile["picture"].save(os.path.join(UPLOAD_FOLDER, filename))
-                    # delete the old image if it exists and is not a sample image
-                    if curr_img not in SAMPLE_IMAGES and os.path.exists(
-                            os.path.join(UPLOAD_FOLDER, curr_img)):
-                        os.remove(os.path.join(UPLOAD_FOLDER, curr_img))
-            else:
-                filename = curr_img
+            # Get existing image
+            curr_image_qry = "SELECT image_path FROM Profile_Images WHERE profile_id = %s"
+            cur.execute(curr_image_qry, (int(id),))
+            curr_image = cur.fetchall()
 
             # News - only add to News table if news has changed
             if _profile["news"] != curr_news:
@@ -659,23 +713,58 @@ def profile_id(id):
             # update profile
             profile_qry = """UPDATE Profiles SET profile_name = %s, 
                 profile_type = %s, profile_breed = %s, profile_availability=%s,
-                profile_news=%s, profile_description=%s, profile_image=%s 
+                profile_news=%s, profile_description=%s
                 WHERE profile_id=%s"""
-            if _profile["picture"] is None:
-                _profile["picture"] = curr_img
             cur.execute(profile_qry, (_profile["name"], _profile["type"],
                                       _profile["breed"],
                                       _profile["availability"],
                                       _profile["news"],
-                                      _profile["description"], filename,
+                                      _profile["description"],
                                       int(id)))
-
             db_connection.commit()
+
+            # update images
+            files = request.files.getlist("pictures[]")
+
+            for file in files:
+                if file.filename != '':
+                    print(files)
+                    print("enter here to delete")
+                    # delete images and resave them to update
+                    image_delete_qry = "DELETE FROM Profile_Images WHERE profile_id = %s"
+                    cur.execute(image_delete_qry, (int(id),))
+                    db_connection.commit()
+
+            for file in files:
+                if file.filename != '':
+                    if file and allowed_file(file.filename):
+                        print("Enter here to update picture")
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        picture_query = "INSERT INTO Profile_Images (profile_id, image_path) VALUES (%s, %s)"
+                        cur = db_connection.cursor()
+                        cur.execute(picture_query, (int(id), filename))
+                        db_connection.commit()
 
             flash("Your profile has been updated!", 'success')
             db_connection.close()
             return { "Result": "Success" }, 200
 
+@app.route("/edit-email-preference/<int:id>", methods=["GET", "POST"])
+def edit_email_preference(id):
+
+    if request.method == "POST":
+        db_connection = db.connect_to_database()
+        user_email_preference = 1
+        if request.form.get("email-preference") == None:
+            user_email_preference = 0
+        update_query = "UPDATE Users SET user_email_preference = %s WHERE user_id = %s;"
+        cur = db_connection.cursor()
+        cur.execute(update_query, (user_email_preference, id))
+        db_connection.commit()
+        db_connection.close()
+        flash("Email Preference is updated!", 'success')
+        return redirect("/user-profile")
 
 # Listener
 if __name__ == "__main__":

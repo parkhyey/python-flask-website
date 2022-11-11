@@ -127,13 +127,17 @@
                   {% endif %}
                 />
               </div> <br>
-              {% if data["profile"] is defined %}
-                <div>
-                  <img src="../static/img/profile/{{ data['profile'][7] }}" class="img-fluid w-100 d-block"/>
-                </div><br>
+              {% if data["images"] is defined %}
+              {% for image in data["images"] %}
+                  <div>
+                    <!-- <img src="../static/img/profile/{{ data['profile'][7] }}" class="img-fluid w-100 d-block"/> -->
+                    <img src="../static/img/profile/{{ image[0] }}" class="img-fluid w-100 d-block"/>
+                  </div>
+                <br>
+              {% endfor %}
               {% endif %}
               <div class="custom-file">
-                <input type="file" class="custom-file-input" name="picture"
+                <input type="file" class="custom-file-input" name="pictures[]" multiple
                        {% if data["profile"] is not defined %}
                        required
                        {% endif %}

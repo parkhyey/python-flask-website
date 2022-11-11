@@ -64,13 +64,16 @@
             <br>
             <div class="d-flex flex-row align-items-center justify-content-center">
 								<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">Edit User Info</button>
-							</div>
+						</div>
+            <div class="d-flex flex-row align-items-center justify-content-center">
+								<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#emailModal">Set Email Preference</button>
+						</div>
           </div>
         </div>
       </div>
     </div>
 </div>
-<!-- Modal -->
+<!-- Edit Profile Modal -->
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -106,6 +109,44 @@
               <label for="message-text" class="control-label">Confirm Password:</label>
               <input type="password" class="form-control" id="confirmPassword" name="confirmation" required>
             </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
+            <input type="submit" value="SAVE CHANGES" class="btn btn-primary" name="Edit_User">
+          </div>
+        </form>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+<!-- Email Preference Modal -->
+<div class="modal fade" id="emailModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="exampleModalLabel">Set Email Preference</h3>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      {% if data %}
+      <div class="modal-body">
+        <form id="edit-email-preference" action="/edit-email-preference/{{ session['id'] }}" method="post">
+          <div class="form-group">
+            {% if data[6] == 1 %}
+            <input
+              type="checkbox"
+              id="email-preference"
+              name="email-preference"
+              checked
+            />
+            {% else %}
+            <input
+              type="checkbox"
+              id="email-preference"
+              name="email-preference"
+            />
+            {% endif %}
+            <label for="email-preference">I would like to receive new animal profile notification emails.</label>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">CLOSE</button>
