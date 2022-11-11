@@ -227,7 +227,8 @@
           margin: 0 auto;
         }
         .hero .text{
-          color: rgba(255,255,255,.8);
+          color: rgba(255,255,255,1);
+          font-size: 17px;
           padding: 0 4em;
         }
         .hero .text h2{
@@ -444,29 +445,56 @@
             	<tr>
             		<td>
             			<div class="text" style="text-align: center;">
-            				<h2>Your Date Request is submitted!</h2>
+            				<h2>Find Your Best Friend</h2>
+                    <p>Search pets from shelters, and rescues for adoption</p>
             			</div>
             		</td>
             	</tr>
             </table>
           </td>
 	      </tr><!-- end tr -->
-	      <tr>
-	        <td class="bg_dark email-section" style="text-align:center;">
-	        	<div class="heading-section heading-section-white">
-	          	<h2><a href="https://fureverfriendfinder.pythonanywhere.com/browse-profiles" target="_blank">Browse Profiles</a></h2>
-	          	<p>Browse all listed animal profiles with pictures to find your perfect pet from shelters and rescues.</p>
-            </div>
-	        </td>
-	      </tr><!-- end: tr -->
         <tr>
-	        <td class="bg_white email-section" style="text-align:center;">
-	        	<div class="heading-section">
-	          	<h2><a href="https://fureverfriendfinder.pythonanywhere.com/search-profiles" target="_blank">Search Profiles</a></h2>
-	          	<p>Search adoptable pets from shelters and rescues by animal types, breeds, disposition and date created. </p>
-            </div>
-	        </td>
-	      </tr><!-- end: tr -->
+		      <td class="bg_white">
+		        <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+		        	<tr>
+					      <td class="bg_white">
+					        <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+					          <tr>
+					            <td class="bg_white email-section">
+					            	<div class="heading-section" style="text-align: center; padding: 0 30px;">
+					              	<h2>You have requested a date with {{ item[0] }}!</h2>
+					              	<p>
+                        </div>
+					            	<table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+					            		<tr>
+			                      <td valign="top" width="50%">
+			                        <table role="presentation" cellspacing="0" cellpadding="0" width="100%">
+			                          <tr>
+			                            <td style="padding-top: 20px; padding-right: 10px;">
+			                              <img src="http://fureverfriendfinder.pythonanywhere.com/static/img/profile/{{ item[4] }}" alt="" style="width: 100%; max-width: 600px; height: auto; margin: auto; display: block;">
+			                              <div class="text-tour" style="text-align: center;">
+			                              	<h3>Name: {{ item[0] }}</h3>
+                                      <h3>Type: {{ item[1] }}</h3>
+                                      <h3>Breed: {{ item[2] }}</h3>
+                                      <h3>Description:</h3>
+                                      <h3>{{ item[3] }}</h3>
+			                              </div>
+			                            </td>
+			                          </tr>
+			                        </table>
+			                      </td>
+			                    </tr>
+					            	</table>
+					            </td>
+					          </tr><!-- end: tr -->
+					        </table>
+
+					      </td>
+					    </tr><!-- end:tr -->
+            </table>
+          </td>
+        </tr>
+
       </table>
       <table role="presentation" cellspacing="0" cellpadding="0" width="100%" style="margin: auto;">
       	<tr>

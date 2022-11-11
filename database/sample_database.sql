@@ -68,18 +68,19 @@ CREATE TABLE Users (
 	user_lname VARCHAR(255) NOT NULL,
 	user_email VARCHAR(255) NOT NULL,
     user_password VARCHAR(255) NOT NULL,
-	user_is_admin TINYINT NOT NULL
+	user_is_admin TINYINT NOT NULL,
+    user_email_preference TINYINT NOT NULL DEFAULT '1'
 ) ENGINE = InnoDB;
 
-INSERT INTO Users(user_fname, user_lname, user_email, user_password, user_is_admin)
+INSERT INTO Users(user_fname, user_lname, user_email, user_password, user_is_admin, user_email_preference)
 VALUES 
-    ("Martha", "Smith", "martha.smith@email.com", SHA1("password1"), 1),
-    ("Peter", "Williams", "peter.williams@email.com", SHA1("password2"), 0),
-    ("Mark", "Brown", "mark.brown@email.com", SHA1("password3"), 1),
-    ("Susan", "Davis", "susan.davis@email.com", SHA1("password4"), 1),
-    ("Joe", "Garcia", "joe.garcia@email.com", SHA1("password5"), 0),
-    ("Mary", "Jones", "mary.jones@email.com", SHA1("password6"), 0),
-    ("David", "Miller", "david.miller@email.com", SHA1("password7"), 1)
+    ("Martha", "Smith", "martha.smith@email.com", SHA1("password1"), 1, 0),
+    ("Peter", "Williams", "peter.williams@email.com", SHA1("password2"), 0, 0),
+    ("Mark", "Brown", "mark.brown@email.com", SHA1("password3"), 1, 0),
+    ("Susan", "Davis", "susan.davis@email.com", SHA1("password4"), 1, 0),
+    ("Joe", "Garcia", "joe.garcia@email.com", SHA1("password5"), 0, 0),
+    ("Mary", "Jones", "mary.jones@email.com", SHA1("password6"), 0, 0),
+    ("David", "Miller", "david.miller@email.com", SHA1("password7"), 1, 1)
 ;
 
 CREATE TABLE Animals (

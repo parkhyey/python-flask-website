@@ -94,7 +94,9 @@ def register():
             user_password = request.form["password"]
             user_password_confirmation = request.form["confirmation"]
             user_is_admin = request.form["admin"]
-
+            user_email_preference = 1
+            if request.form.get("email-preference") == None:
+                user_email_preference = 0
             # Select Users table for account verifcation
             users_select_query = "SELECT * FROM Users WHERE user_email = %s"
 
@@ -108,9 +110,9 @@ def register():
                 return redirect("/signup")
             elif user_password_confirmation == user_password:
                 # Insert into Users table
-                users_insert_query = "INSERT INTO Users (user_fname, user_lname, user_email, user_password, user_is_admin) VALUES (%s, %s, %s, SHA1(%s), %s);"
+                users_insert_query = "INSERT INTO Users (user_fname, user_lname, user_email, user_password, user_is_admin, user_email_preference) VALUES (%s, %s, %s, SHA1(%s), %s, %s);"
 
-                cur.execute(users_insert_query, (user_fname, user_lname, user_email, user_password, user_is_admin))
+                cur.execute(users_insert_query, (user_fname, user_lname, user_email, user_password, user_is_admin, user_email_preference))
 
                 db_connection.commit()
                 flash("Your account has been created! Please sign in", 'success')
@@ -363,19 +365,28 @@ def date_request(page, id, user_email):
         insert_qry = "INSERT INTO Date_Requests (profile_id, user_email) VALUES (%s, %s);"
         data_params_insert = (id, user_email)
         insert_cursor = db.execute_query(db_connection=db_connection, query=insert_qry, query_params=data_params_insert)
-        insert_results = request_cursor.fetchall()
+        insert_results = insert_cursor.fetchall()
 
     if len(select_results) == 0:
         flash("To request a date, the animal profile must be available.", 'error')
 
     elif len(select_results) > 0:
         flash("You have successfully requested a date! Check your email for confirmation.", 'success')
+        profile_qry = """SELECT profile_name, profile_type, profile_breed, profile_description, 
+                            (SELECT i.image_path
+			                FROM Profile_Images i
+                            WHERE i.profile_id = Profiles.profile_id LIMIT 1) AS profile_image
+                            FROM Profiles 
+                            WHERE profile_id = %s;"""
+        cur = db_connection.cursor()
+        cur.execute(profile_qry, (id,))
+        profile = cur.fetchone()
         if user_email:
             message = Message(
                 sender = SENDER, 
                 subject="Your Date Request Confirmation",
                 recipients=[user_email],
-                html = render_template('email/date-notification.html'),
+                html = render_template('email/date-notification.html', item = profile),
                 )
             mail.send(message)
 
@@ -593,19 +604,26 @@ def notification_send():
     cur = db_connection.cursor()
     cur.execute(new_profile_qry)
     new_profile = cur.fetchone()
-    print("new_profile", new_profile)
     html = render_template('email/new-notification.html', item = new_profile)
 
     with app.app_context():
         for i in range(len(users)):
-            message = Message(
-                sender = SENDER, 
-                subject="Meet our new furry friends!",
-                recipients=[users[i][0]],
-                html = html
-                )
-            print("email(", i, ")=", users[i][0])
-            Thread(target=send_email_thread, args=[message]).start()
+            user_email = users[i][0]
+            preference_qry = "SELECT user_email_preference FROM Users \
+                WHERE user_email = %s;"
+            data = (user_email,)
+            preference_cursor = db.execute_query(db_connection=db_connection, query=preference_qry, query_params=data)
+            preference_results = preference_cursor.fetchall()
+
+            # check user email preference
+            if preference_results[0]['user_email_preference'] == 1:
+                message = Message(
+                    sender = SENDER, 
+                    subject="Meet our new furry friends!",
+                    recipients=[user_email],
+                    html = html
+                    )
+                Thread(target=send_email_thread, args=[message]).start()
     db_connection.close()
 
 @app.route('/profiles/<int:id>', methods=["GET", "PUT"])
@@ -731,6 +749,22 @@ def profile_id(id):
             flash("Your profile has been updated!", 'success')
             db_connection.close()
             return { "Result": "Success" }, 200
+
+@app.route("/edit-email-preference/<int:id>", methods=["GET", "POST"])
+def edit_email_preference(id):
+
+    if request.method == "POST":
+        db_connection = db.connect_to_database()
+        user_email_preference = 1
+        if request.form.get("email-preference") == None:
+            user_email_preference = 0
+        update_query = "UPDATE Users SET user_email_preference = %s WHERE user_id = %s;"
+        cur = db_connection.cursor()
+        cur.execute(update_query, (user_email_preference, id))
+        db_connection.commit()
+        db_connection.close()
+        flash("Email Preference is updated!", 'success')
+        return redirect("/user-profile")
 
 # Listener
 if __name__ == "__main__":
