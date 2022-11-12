@@ -70,9 +70,13 @@
                     </div>
                     <div class="carousel-inner">
                       {% for image in (story['combined_images']).split(',') %}
-                      <div class="carousel-item active">
-                        <img src="../static/img/profile/{{ image }}" class="img-fluid">
-                      </div>
+                          {% if image ==  (story['combined_images']).split(',')[0] %}
+                            <div class="carousel-item active">
+                          {% else %}
+                            <div class="carousel-item">
+                          {% endif %}
+                            <img src="../static/img/profile/{{ image }}" class="img-fluid">
+                          </div>
                       {% endfor %}
                     </div>
                     <button class="carousel-control-prev" type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide="prev">

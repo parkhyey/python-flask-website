@@ -10,7 +10,6 @@ from threading import Thread
 from werkzeug.utils import secure_filename
 
 # Define Upload folder
-# UPLOAD_FOLDER = "static/img/profile"
 ALLOWED_EXTENSIONS = set(["txt", "pdf", "png", "jpg", "jpeg", "gif"])
 
 def allowed_file(filename):
@@ -21,7 +20,6 @@ SAMPLE_IMAGES = ['goat.jpg', 'golden.jpg', 'gsd.jpg', 'hamster.jpg', 'persian.jp
 
 # Configuration
 app = Flask(__name__)
-# app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 app.config["UPLOAD_FOLDER"] = os.environ.get("UPLOAD_FOLDER")
 app.permanent_session_lifetime = datetime.timedelta(days=365)
 app.secret_key = "secret"  
@@ -494,7 +492,6 @@ def delete_profiles(id):
 
     # Split profile_img string into array
     profile_img_arr = profile_img.split(',')
-    # print(profile_img_arr)
 
     # delete the select image file if exists
     for img in profile_img_arr:
@@ -520,7 +517,6 @@ def get_profile_form_values(request):
         "availability": request.form["availability"],
         "news": request.form["news"],
         "description": request.form["description"],
-        "picture": request.files.get("picture", None)
     }
 
 
@@ -542,15 +538,18 @@ def profile():
 
             # Save multiple pictures and insert into Profile_Images table
             files = request.files.getlist("pictures[]")
-
-            for file in files:
-                if file and allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                    picture_query = "INSERT INTO Profile_Images (profile_id, image_path) VALUES (@profile_id, %s)"
-                    cur = db_connection.cursor()
-                    cur.execute(picture_query, (filename,))
-            cur.close()
+            if len(files) != 3:
+                flash("Please select THREE pictures for image upload", 'error')
+                return redirect("/create-profiles")
+            else:
+                for file in files:
+                    if file and allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                        picture_query = "INSERT INTO Profile_Images (profile_id, image_path) VALUES (@profile_id, %s)"
+                        cur = db_connection.cursor()
+                        cur.execute(picture_query, (filename,))
+                cur.close()
 
             # Insert into News table
             news_query = "INSERT INTO News (profile_id, news_description) VALUES (@profile_id, %s);"
@@ -652,7 +651,7 @@ def profile_id(id):
         cur.execute(animal_qry)
         animals = cur.fetchall()
 
-        image_qry = "SELECT image_path FROM Profile_Images WHERE profile_id = %s"
+        image_qry = "SELECT * FROM Profile_Images WHERE profile_id = %s"
         cur.execute(image_qry, (int(id),))
         images = cur.fetchall()
 
@@ -686,9 +685,15 @@ def profile_id(id):
             curr_news = curr_profile[5]
 
             # Get existing image
-            curr_image_qry = "SELECT image_path FROM Profile_Images WHERE profile_id = %s"
+            curr_image_qry = "SELECT * FROM Profile_Images WHERE profile_id = %s"
             cur.execute(curr_image_qry, (int(id),))
             curr_image = cur.fetchall()
+            curr_image1 = curr_image[0][2]
+            curr_image_id1 = curr_image[0][0]
+            curr_image2 = curr_image[1][2]
+            curr_image_id2 = curr_image[1][0]
+            curr_image3 = curr_image[2][2]
+            curr_image_id3 = curr_image[2][0]
 
             # News - only add to News table if news has changed
             if _profile["news"] != curr_news:
@@ -724,26 +729,39 @@ def profile_id(id):
             db_connection.commit()
 
             # update images
-            files = request.files.getlist("pictures[]")
+            file1 = request.files["picture1"]
+            file2 = request.files["picture2"]
+            file3 = request.files["picture3"]
 
-            for file in files:
-                if file.filename != '':
-                    print(files)
-                    print("enter here to delete")
-                    # delete images and resave them to update
-                    image_delete_qry = "DELETE FROM Profile_Images WHERE profile_id = %s"
-                    cur.execute(image_delete_qry, (int(id),))
-                    db_connection.commit()
+            if file1.filename != '' or file2.filename != '' or file3.filename != '':
+                if (file1 and allowed_file(file1.filename)) or (file2 and allowed_file(file2.filename)) or (file3 and allowed_file(file3.filename)):
 
-            for file in files:
-                if file.filename != '':
-                    if file and allowed_file(file.filename):
-                        print("Enter here to update picture")
-                        filename = secure_filename(file.filename)
-                        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                        picture_query = "INSERT INTO Profile_Images (profile_id, image_path) VALUES (%s, %s)"
-                        cur = db_connection.cursor()
-                        cur.execute(picture_query, (int(id), filename))
+                    if file1 and curr_image1 != file1:
+                        filename1 = secure_filename(file1.filename)
+                        file1.save(os.path.join(app.config['UPLOAD_FOLDER'], filename1))
+                        if curr_image1 not in SAMPLE_IMAGES and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], curr_image1)):
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], curr_image1))
+                    if file2 and curr_image2 != file2:
+                        filename2 = secure_filename(file2.filename)
+                        file2.save(os.path.join(app.config['UPLOAD_FOLDER'], filename2))
+                        if curr_image2 not in SAMPLE_IMAGES and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], curr_image2)):
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], curr_image2))
+                    if file3 and curr_image3 != file3:
+                        filename3 = secure_filename(file3.filename)
+                        file3.save(os.path.join(app.config['UPLOAD_FOLDER'], filename3))
+                        if curr_image3 not in SAMPLE_IMAGES and os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], curr_image3)):
+                            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], curr_image3))
+
+                    picture_query = "UPDATE Profile_Images SET image_path = %s WHERE profile_id = %s AND image_path = %s AND image_id = %s"
+                    cur = db_connection.cursor()
+                    if file1 != curr_image1:
+                        cur.execute(picture_query, (filename1, int(id), curr_image1, curr_image_id1))
+                        db_connection.commit()
+                    if file2:
+                        cur.execute(picture_query, (filename2, int(id), curr_image2, curr_image_id2))
+                        db_connection.commit()
+                    if file3:
+                        cur.execute(picture_query, (filename3, int(id), curr_image3, curr_image_id3))
                         db_connection.commit()
 
             flash("Your profile has been updated!", 'success')
