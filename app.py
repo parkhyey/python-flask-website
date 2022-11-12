@@ -754,7 +754,7 @@ def profile_id(id):
 
                     picture_query = "UPDATE Profile_Images SET image_path = %s WHERE profile_id = %s AND image_path = %s AND image_id = %s"
                     cur = db_connection.cursor()
-                    if file1 != curr_image1:
+                    if file1:
                         cur.execute(picture_query, (filename1, int(id), curr_image1, curr_image_id1))
                         db_connection.commit()
                     if file2:
