@@ -62,7 +62,7 @@
                 <li class="list-group-item hstack">
 
                   <!-- Carousel -->
-                  <div id="hello{{ story['news_id'] }}" class="carousel slide" data-bs-ride="true" style="width: 640px; height:360px;">
+                  <div id="hello{{ story['news_id'] }}" class="carousel slide" data-bs-ride="true" style="max-width: 640px;">
                     <div class="carousel-indicators">
                       <button type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
                       <button type="button" data-bs-target="#hello{{ story['news_id'] }}" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -90,7 +90,7 @@
                   </div>
 
                   <div class="col">
-                    <div class="p-5 vstack">
+                    <div class="p-3 vstack">
                       <h5>{{ story['news_date'] }}</h5>
                       <p>{{ story['news_description'] }}</p>
                     </div>
